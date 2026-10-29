@@ -74,12 +74,21 @@ export function EntradaPago({
   placeholder,
   tipo = "text",
   opciones,
+  value,
+  onChange,
 }: {
   placeholder: string;
-  tipo?: "text" | "tel" | "email";
+  tipo?: "text" | "tel" | "email" | "numero";
   opciones?: string[];
+  value?: string;
+  onChange?: (v: string) => void;
 }) {
-  const [valor, setValor] = useState("");
+  const [interno, setInterno] = useState("");
+  const valor = value ?? interno;
+  const setValor = (v: string) => {
+    setInterno(v);
+    onChange?.(v);
+  };
   const [abierto, setAbierto] = useState(false);
   const [enfocado, setEnfocado] = useState(false);
   const borde = enfocado || abierto ? "border-secondary4-400" : "border-[#D6DAD2]";
@@ -121,7 +130,7 @@ export function EntradaPago({
       onChangeText={setValor}
       placeholder={placeholder}
       placeholderTextColor="#9AA3AF"
-      keyboardType={tipo === "tel" ? "phone-pad" : tipo === "email" ? "email-address" : "default"}
+      keyboardType={tipo === "tel" ? "phone-pad" : tipo === "email" ? "email-address" : tipo === "numero" ? "number-pad" : "default"}
       autoCapitalize={tipo === "email" ? "none" : "sentences"}
       onFocus={() => setEnfocado(true)}
       onBlur={() => setEnfocado(false)}

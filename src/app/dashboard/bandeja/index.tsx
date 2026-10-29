@@ -46,7 +46,7 @@ export default function Inbox() {
   const [perVentas, setPerVentas] = useState("Semana");
 
   return (
-    <Pagina>
+    <Pagina buscador>
       <View>
         <TituloSeccion titulo="Tus Pedidos" enlace="Ver Todos" href="/dashboard/bandeja/pedidos" />
         <TablaPedidos pedidos={pedidos} onFila={(p) => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: p.id } })} />

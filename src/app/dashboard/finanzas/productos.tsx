@@ -112,7 +112,7 @@ export default function ProductIndicators() {
   const rango = `${inicio.getDate()} de ${MESES_ES[inicio.getMonth()]} ${inicio.getFullYear()} - ${fin.getDate()} de ${MESES_ES[fin.getMonth()]} ${fin.getFullYear()}`;
 
   return (
-    <Pagina>
+    <Pagina buscador>
       <View className="flex-row flex-wrap items-center justify-between gap-4" style={{ zIndex: calAbierto ? 50 : 1 }}>
         <Texto className="max-w-64 font-sans text-xl leading-snug text-neutral-500">Resumen de stock por producto registrados</Texto>
         <View>

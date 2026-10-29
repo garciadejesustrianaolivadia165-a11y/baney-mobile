@@ -97,7 +97,7 @@ export default function MisProductos() {
   const irStock = (id: string) => router.push({ pathname: "/dashboard/productos/[id]/stock", params: { id } });
 
   return (
-    <Pagina>
+    <Pagina buscador>
       {/* Título y acción principal */}
       <View className="flex-row flex-wrap items-end justify-between gap-4">
         <View>

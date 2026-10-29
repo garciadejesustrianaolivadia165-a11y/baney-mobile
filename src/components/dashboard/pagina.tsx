@@ -1,15 +1,21 @@
-import { ScrollView, View, type ViewProps } from "react-native";
+import { useState } from "react";
+import { Pressable, ScrollView, View, type LayoutChangeEvent, type ViewProps } from "react-native";
 import { useRouter, type Href } from "expo-router";
-import { Pressable } from "react-native";
 
 import SearchHeader from "@/components/dashboard/search-header";
 import Texto from "@/components/ui/texto";
 
-/** Contenedor con scroll de cada pantalla del dashboard (SearchHeader + secciones con gap-6) */
-export default function Pagina({ children, sinBuscador, className = "gap-6" }: { children: React.ReactNode; sinBuscador?: boolean; className?: string }) {
+/**
+ * Contenedor con scroll de cada pantalla del dashboard (secciones con gap-6).
+ * El buscador de la web solo aparece en móvil cuando la pantalla tiene un listado
+ * (`buscador`); en pantallas anchas (tablet/web, ≥ 900 px) se muestra siempre.
+ */
+export default function Pagina({ children, buscador = false, className = "gap-6" }: { children: React.ReactNode; buscador?: boolean; className?: string }) {
+  const [ancho, setAncho] = useState(0);
+  const mostrar = buscador || ancho >= 900;
   return (
-    <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerClassName={`pb-10 ${className}`}>
-      {!sinBuscador && <SearchHeader />}
+    <ScrollView onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerClassName={`pb-10 ${className}`}>
+      {mostrar && <SearchHeader />}
       {children}
     </ScrollView>
   );

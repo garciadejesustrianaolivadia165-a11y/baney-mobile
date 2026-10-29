@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import BotonPill from "@/components/movil/boton-pill";
 import BuscadorLugar from "@/components/movil/buscador-lugar";
 import CabeceraVolver from "@/components/movil/cabecera-volver";
-import { BotonPago, Casilla, EntradaPago, FilaDato, LogoPayPal, MarcasTarjeta, ResumenPago } from "@/components/movil/pago";
+import MediosPago from "@/components/movil/medios-pago";
 import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
@@ -30,12 +30,6 @@ const CONDICIONES = [
   { c: "Material peligroso", d: "Químicos, inflamables o corrosivos", i: "M12 3l9.5 16.5H2.5L12 3zM12 10v4M12 17h.01" },
   { c: "Ninguna", d: "Carga estándar, sin requisitos extra", i: ICONOS.check },
 ];
-const METODOS = [
-  { id: "debito", titulo: "Debito", sub: "****6789" },
-  { id: "credito", titulo: "Crédito", sub: "****6789" },
-  { id: "nueva", titulo: "Agregar Tarjeta Debito/Crédito", sub: "****6789" },
-  { id: "paypal", titulo: "PayPal", sub: "" },
-];
 
 function Titulo({ children }: { children: string }) {
   return <Texto className="text-[17px] font-bold text-[#16202E]">{children}</Texto>;
@@ -53,7 +47,6 @@ export default function Solicitud() {
   const [unidad, setUnidad] = useState("Ton");
   const [condiciones, setCondiciones] = useState<string[]>([]);
   const [notas, setNotas] = useState("");
-  const [metodoPago, setMetodoPago] = useState<string | null>(null);
 
   function alternarCondicion(c: string) {
     setCondiciones((prev) =>
@@ -212,99 +205,8 @@ export default function Solicitud() {
             </>
           )}
 
-          {/* ---------- PASO 3: PAGO ---------- */}
-          {paso === 3 && (
-            <View className="gap-4">
-              {METODOS.map((m) => {
-                const abierto = metodoPago === m.id;
-                return (
-                  <View key={m.id}>
-                    <Pressable
-                      accessibilityRole="button"
-                      accessibilityState={{ expanded: abierto }}
-                      onPress={() => setMetodoPago(abierto ? null : m.id)}
-                      className={`w-full flex-row items-center justify-between gap-3 rounded-2xl px-5 py-4 ${abierto ? "border-2 border-[#8B9A3A] bg-[#E6EAE0]" : "border-2 border-[#EFEFEF] bg-[#EFEFEF]"}`}
-                    >
-                      {m.id === "paypal" ? (
-                        <LogoPayPal />
-                      ) : (
-                        <View className="min-w-0">
-                          <Texto className="text-[14px] font-bold text-[#16202E]">{m.titulo}</Texto>
-                          <Texto className="text-[14px] font-bold text-[#16202E]">{m.sub}</Texto>
-                        </View>
-                      )}
-                      {m.id !== "paypal" && <MarcasTarjeta />}
-                    </Pressable>
-
-                    {abierto && (
-                      <View style={SOMBRA.card} className="mt-4 rounded-2xl border border-[#EDEFEB] bg-white px-5 py-5">
-                        {(m.id === "debito" || m.id === "credito") && (
-                          <>
-                            <Texto className="text-[20px] font-bold text-[#16202E]">Medio de pago</Texto>
-                            <Texto className="mt-2 text-[16px] text-[#16202E]">{m.id === "debito" ? "Tarjeta Débito" : "Tarjeta Crédito"}</Texto>
-                            <View className="mt-4">
-                              <FilaDato k="Nombre del titular" v="Juan Pérez" />
-                              <FilaDato k="Número de tarjeta" v="**** 6789" />
-                              <FilaDato k="Fecha de vencimiento" v="12/23" />
-                              {m.id === "credito" && <FilaDato k="Cuotas" v="1" />}
-                              <FilaDato k="Total" v="RD$ 4,500.00" fuerte />
-                            </View>
-                            <View className="mt-4">
-                              <MarcasTarjeta />
-                            </View>
-                            <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Información de pago</Texto>
-                            <ResumenPago material={material} />
-                            <BotonPago onPress={confirmar}>Continuar</BotonPago>
-                          </>
-                        )}
-
-                        {m.id === "nueva" && (
-                          <>
-                            <Texto className="text-[20px] font-bold text-[#16202E]">Completa la información</Texto>
-                            <View className="mt-4 gap-3">
-                              <EntradaPago placeholder="Nombre del titular" />
-                              <EntradaPago placeholder="Número de tarjeta" />
-                              <View className="flex-row gap-3">
-                                <View className="flex-1"><EntradaPago placeholder="CVC/CVV" /></View>
-                                <View className="flex-1"><EntradaPago placeholder="Fecha de Vencimiento" /></View>
-                              </View>
-                            </View>
-                            <Casilla>Guardar esta tarjeta de forma segura para mi compra posterior</Casilla>
-                            <BotonPago onPress={confirmar}>Continuar</BotonPago>
-                          </>
-                        )}
-
-                        {m.id === "paypal" && (
-                          <>
-                            <Texto className="text-[20px] font-bold text-[#16202E]">Medio de pago</Texto>
-                            <View className="mt-4">
-                              <LogoPayPal size={34} />
-                            </View>
-                            <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Información de pago</Texto>
-                            <ResumenPago material={material} />
-                            <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Completa la información</Texto>
-                            <View className="mt-4 gap-3">
-                              <EntradaPago placeholder="Nombre del titular" />
-                              <EntradaPago placeholder="Tipo de identificación" opciones={["Cédula", "Pasaporte", "RNC"]} />
-                              <EntradaPago placeholder="Número de identificación" />
-                              <EntradaPago placeholder="Número de teléfono" tipo="tel" />
-                              <EntradaPago placeholder="Correo electrónico" tipo="email" />
-                              <EntradaPago placeholder="Selecciona tu banco" opciones={["Banco Popular Dominicano", "Banreservas", "BHD", "Scotiabank"]} />
-                            </View>
-                            <Casilla>
-                              Acepto haber leído los{" "}
-                              <Texto className="text-[12px] text-[#4A5720] underline">términos y condiciones y políticas de privacidad</Texto> para hacer este pago
-                            </Casilla>
-                            <BotonPago onPress={confirmar}>Ir a plataforma de pago</BotonPago>
-                          </>
-                        )}
-                      </View>
-                    )}
-                  </View>
-                );
-              })}
-            </View>
-          )}
+          {/* ---------- PASO 3: PAGO (pasarela compartida con Perfil → Métodos de pago) ---------- */}
+          {paso === 3 && <MediosPago modo="pago" material={material} onContinuar={confirmar} />}
         </ScrollView>
       </KeyboardAvoidingView>
 
