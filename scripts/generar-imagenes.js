@@ -8,7 +8,6 @@ const out = [
   "// GENERADO: registro de assets. Mapea las rutas web (\"/images/...\") que usan",
   "// los datos de app/lib a require() estáticos, que es lo que exige Metro.",
   "// Regenerar con: node scripts/generar-imagenes.js",
-  'import type { ImageSourcePropType } from "react-native";',
   "",
   "export const IMAGENES = {",
 ];
@@ -26,13 +25,13 @@ function recorrer(dir) {
 for (const d of ["images", "icons", "logos"]) recorrer(path.join(raiz, "assets", d));
 
 out.push(
-  "} as const satisfies Record<string, ImageSourcePropType>;",
+  "} as const satisfies Record<string, number>;",
   "",
   "export type RutaImagen = keyof typeof IMAGENES;",
   "",
   '/** Devuelve el source nativo de una ruta web del design system (p. ej. "/logos/Baney_logo_png.png"). */',
-  "export function imagen(ruta: string): ImageSourcePropType {",
-  "  const src = (IMAGENES as Record<string, ImageSourcePropType>)[ruta];",
+  "export function imagen(ruta: string): number {",
+  "  const src = (IMAGENES as Record<string, number>)[ruta];",
   "  if (!src && __DEV__) console.warn(`[imagenes] ruta no registrada: ${ruta}`);",
   '  return src ?? IMAGENES["/logos/Baney_logo_png.png"];',
   "}",

@@ -1,7 +1,6 @@
 // GENERADO: registro de assets. Mapea las rutas web ("/images/...") que usan
 // los datos de app/lib a require() estáticos, que es lo que exige Metro.
 // Regenerar con: node scripts/generar-imagenes.js
-import type { ImageSourcePropType } from "react-native";
 
 export const IMAGENES = {
   "/images/BlobsVector_01_login.png": require("../../assets/images/BlobsVector_01_login.png"),
@@ -63,13 +62,14 @@ export const IMAGENES = {
   "/logos/Logo_Horizontal_baney.jpg": require("../../assets/logos/Logo_Horizontal_baney.jpg"),
   "/logos/Logo_Horizontal_baney_png.png": require("../../assets/logos/Logo_Horizontal_baney_png.png"),
   "/logos/Logotipo_BANEY.jpg": require("../../assets/logos/Logotipo_BANEY.jpg"),
-} as const satisfies Record<string, ImageSourcePropType>;
+  "/logos/Logotipo_BANEY.png": require("../../assets/logos/Logotipo_BANEY.png"),
+} as const satisfies Record<string, number>;
 
 export type RutaImagen = keyof typeof IMAGENES;
 
 /** Devuelve el source nativo de una ruta web del design system (p. ej. "/logos/Baney_logo_png.png"). */
-export function imagen(ruta: string): ImageSourcePropType {
-  const src = (IMAGENES as Record<string, ImageSourcePropType>)[ruta];
+export function imagen(ruta: string): number {
+  const src = (IMAGENES as Record<string, number>)[ruta];
   if (!src && __DEV__) console.warn(`[imagenes] ruta no registrada: ${ruta}`);
   return src ?? IMAGENES["/logos/Baney_logo_png.png"];
 }

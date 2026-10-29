@@ -24,7 +24,7 @@ Las rutas tipadas (`experiments.typedRoutes`) se generan al arrancar `expo start
 
 ## Estado de la migración
 
-Ver `docs/PLAN_MIGRACION_REACT_NATIVE.md`. Hecho: scaffold, paleta, fuentes, assets, tipos, datos de ejemplo, primitivas `ui/button`, `ui/input`, `ui/google-button` y `loading-screen`. Pendiente: pantallas (prototipo móvil → auth → home → marketplace → checkout → dashboard).
+Ver `docs/PLAN_MIGRACION_REACT_NATIVE.md`. Hecho: scaffold, paleta, fuentes, assets, tipos, datos, primitivas `ui/` y **Fase 3a: el prototipo móvil completo** (`routes/mobile.tsx` de la web partido en pantallas: carga, onboarding, rol, busca, auth, mapa, solicitud, confirmada, tracking, historial, alertas, perfil, dashboard y mapa del transportista, flota). Pendiente: auth web, home/landing, marketplace, checkout y dashboard del proveedor (`src/app/dashboard` y `src/app/marketplace` son provisionales).
 
 ## Equivalencias web → nativo
 
@@ -33,7 +33,7 @@ Ver `docs/PLAN_MIGRACION_REACT_NATIVE.md`. Hecho: scaffold, paleta, fuentes, ass
 | `<div>` | `View` |
 | `<p>`, `<span>`, `<h1>`… | `Text` (todo texto va dentro de `Text`, siempre con `font-sans` o `font-inter`) |
 | `<img src="/images/x.png">` | `<Image source={imagen("/images/x.png")}>` de `expo-image` |
-| `<button>`, `hover:`/`active:` | `Pressable`; estado `pressed` (no existe hover) |
+| `<button>`, `hover:`/`active:` | `Presionable` (`ui/presionable`); estado `pressed` (no existe hover). **NativeWind descarta `style={({pressed}) => …}` en un `Pressable` con `className`**: usar siempre `Presionable` con `estilo={(pressed) => …}` |
 | `<input>` | `TextInput` (`ui/input`) |
 | `Link to`, `useNavigate`, `useParams` | `Link href`, `useRouter`, `useLocalSearchParams` de `expo-router` |
 | `app/routes.ts` + `routes/*.tsx` | archivos en `src/app/` (`_layout.tsx` = layout de React Router) |
@@ -43,7 +43,9 @@ Ver `docs/PLAN_MIGRACION_REACT_NATIVE.md`. Hecho: scaffold, paleta, fuentes, ass
 | `fixed inset-0` | `absolute inset-0` |
 | `~/components/...` | `@/components/...` |
 
-Mapa de rutas: `/` → `src/app/index.tsx`; `/login` → `src/app/(auth)/login.tsx`; `/marketplace/producto/:id` → `src/app/marketplace/producto/[id].tsx`; `/dashboard/*` → `src/app/(dashboard)/` con `_layout.tsx` (Drawer = Sidebar); el prototipo `routes/mobile.tsx` (12 vistas en una máquina de estados) se parte en una pantalla por archivo bajo `src/app/(mobile)/`.
+Mapa de rutas: `/` → `src/app/index.tsx` (splash); prototipo móvil: `/onboarding`, `/rol`, `/busca`, `/auth`, `/solicitud`, `/confirmada`, `/flota` como pantallas sueltas y, bajo `src/app/(app)/` (Tabs con la barra `NavInferior`, ítems según el rol de `lib/sesion.ts`): `/mapa`, `/historial`, `/alertas`, `/perfil`, `/tracking`, `/transportista`, `/transportista-mapa`. Web pendiente: `/login` → `src/app/(auth)/login.tsx`; `/marketplace/producto/:id` → `src/app/marketplace/producto/[id].tsx`; `/dashboard/*` → `src/app/dashboard/` con `_layout.tsx` (Drawer = Sidebar).
+
+Lecciones del prototipo: medir tamaños con `onLayout` (`useWindowDimensions` llega vacío en el export web estático); las sombras CSS arbitrarias van como `style` desde `SOMBRA` en `lib/estilos.ts`; los colores "sueltos" del Figma de la Fase 1 están en `C` del mismo archivo; el mapa es `components/mapa.tsx` (react-native-maps, incluido en Expo Go) con `mapa.web.tsx` (iframe de Google Maps); los íconos de trazo de la web se dibujan con `ui/icono.tsx` (`ICONOS` reúne los `d` compartidos); los textos usan `ui/texto.tsx`, que aplica Inter salvo que la clase lleve `font-sans`.
 
 ## Arquitectura
 
@@ -85,7 +87,7 @@ Ojo: en el frame "Colores" del Figma varias etiquetas hex están mal; los valore
 
 ### Assets
 
-`assets/` se sirve por URL directa: `assets/logos/Logotipo_BANEY_SVG.svg` → `/logos/Logotipo_BANEY_SVG.svg`. El alias `~` importa desde `app/` (ej. `~/components/ui/button`).
+Las imágenes se referencian por su ruta web de siempre a través del registro generado `src/lib/imagenes.ts`: `IMAGENES["/images/..."]` o `imagen(ruta)` (Metro exige `require()` estáticos; el tipo es `number`). Tras añadir archivos a `assets/`, ejecutar `node scripts/generar-imagenes.js`. El alias `@` importa desde `src/`. `Logotipo_BANEY.png` es la hoja del logo rasterizada desde el SVG (react-native-svg no carga archivos .svg sin transformer).
 
 - `assets/logos/` — `Logotipo_BANEY_SVG.svg` (hoja, sin fondo), `Logo_Horizontal_baney_png.png` (sidebar), `Baney_logo_png.png`, `BANEY_TITULO.png`
 - `assets/images/` — fotos y recursos del login: `Fondo_login.jpg`, `Image_login.png`, `granjero.png`, `BlobsVector_01_login.png` (mancha crema) y `BlobsVector_02_login.png` (mancha marrón), más los íconos PNG del sidebar (`home.png`, `direct-inbox.png`, `folder-open.png`, `task-square.png`, `people.png`)
@@ -97,5 +99,5 @@ Advertencia: algunos PNG exportados traen franjas transparentes (p. ej. `Image_l
 ## Notas de entorno
 
 - Node ≥ 20 (la sesión en la nube usa 22). Instalar paquetes **siempre** con `npx expo install <paquete>` para que la versión sea compatible con el SDK.
-- Expo Go solo trae sus módulos nativos; si se añade una librería con código nativo (p. ej. `react-native-maps`), hace falta un development build con EAS (`npx eas-cli@latest build --profile development`).
+- Expo Go solo trae sus módulos nativos (`react-native-maps` sí está incluido); si se añade otra librería con código nativo, hace falta un development build con EAS (`npx eas-cli@latest build --profile development`).
 - No existen carpetas `ios/`/`android/`: la configuración nativa va en `app.json` y config plugins.

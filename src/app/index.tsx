@@ -1,52 +1,62 @@
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Easing, View } from "react-native";
 import { Image } from "expo-image";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 
-import Button from "@/components/ui/button";
-import GoogleButton from "@/components/ui/google-button";
-import LoadingScreen from "@/components/loading-screen";
+import Texto from "@/components/ui/texto";
 import { IMAGENES } from "@/lib/imagenes";
-import { CATALOGO } from "@/lib/productos";
 
-// Pantalla inicial provisional de la Fase 1: comprueba que fuentes, paleta,
-// assets, datos y primitivas funcionan. La reemplazan las pantallas de la Fase 3
-// (carga → onboarding → rol → auth), partidas desde routes/mobile.tsx de la web.
-export default function Inicio() {
-  const [cargando, setCargando] = useState(true);
+// ============ VISTA 1: CARGA (splash) ============
+// Pasa sola al onboarding a los 2,5 s, como en el prototipo web.
+export default function Carga() {
+  const router = useRouter();
+  const giro = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const t = setTimeout(() => setCargando(false), 1500);
-    return () => clearTimeout(t);
-  }, []);
+    const anim = Animated.loop(
+      Animated.timing(giro, { toValue: 1, duration: 1000, easing: Easing.linear, useNativeDriver: true }),
+    );
+    anim.start();
+    const t = setTimeout(() => router.replace("/onboarding"), 2500);
+    return () => {
+      anim.stop();
+      clearTimeout(t);
+    };
+  }, [giro, router]);
 
-  if (cargando) return <LoadingScreen />;
+  const rotate = giro.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] });
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <View className="flex-1 items-center justify-center gap-6 px-6">
+    <View className="flex-1 items-center bg-caney-dark px-8">
+      {/* Bloque central: hoja + BANEY + lema */}
+      <View className="-mt-16 flex-1 items-center justify-center">
+        <Image source={IMAGENES["/logos/Logotipo_BANEY.png"]} contentFit="contain" style={{ width: 128, height: 128 }} />
         <Image
-          source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]}
-          contentFit="contain"
+          source={IMAGENES["/images/image_mobile/baney_white.png"]}
           accessibilityLabel="BANEY"
-          style={{ width: 220, height: 72 }}
+          contentFit="contain"
+          style={{ width: 200, height: 64, marginTop: 24 }}
         />
-        <Text className="text-center font-sans text-3xl font-bold text-primary-600">
-          Vender, mover y cumplir
-        </Text>
-        <Text className="text-center font-sans text-base text-neutral-700">
-          Marketplace agropecuario y de logística de República Dominicana.
-        </Text>
-        <Text className="font-inter text-sm text-secondary4-500">
-          {CATALOGO.length} productos de ejemplo cargados
-        </Text>
-
-        <View className="mt-4 w-full gap-3">
-          <Button>Iniciar sesión</Button>
-          <Button variant="outline">Crear cuenta</Button>
-          <GoogleButton label="Continuar con Google" className="self-center" />
-        </View>
+        <Texto className="mt-5 text-[15px] text-neutral-300">Logística inteligente.</Texto>
       </View>
-    </SafeAreaView>
+
+      {/* Spinner inferior */}
+      <View className="items-center gap-3 pb-16">
+        <Animated.View style={{ transform: [{ rotate }] }} accessibilityRole="progressbar" accessibilityLabel="Cargando">
+          <Svg viewBox="0 0 56 56" width={44} height={44}>
+            <Defs>
+              <LinearGradient id="spin-m" x1="0%" y1="0%" x2="100%" y2="100%">
+                <Stop offset="0%" stopColor="#6b4926" />
+                <Stop offset="55%" stopColor="#cdaf86" />
+                <Stop offset="100%" stopColor="#f5ede0" />
+              </LinearGradient>
+            </Defs>
+            <Circle cx="28" cy="28" r="22" fill="none" stroke="url(#spin-m)" strokeWidth="6" strokeLinecap="round" strokeDasharray="104 34" />
+          </Svg>
+        </Animated.View>
+        <Texto className="text-sm text-neutral-400">Cargando…</Texto>
+      </View>
+    </View>
   );
 }
