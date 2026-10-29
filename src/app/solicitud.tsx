@@ -7,6 +7,7 @@ import BotonPill from "@/components/movil/boton-pill";
 import BuscadorLugar from "@/components/movil/buscador-lugar";
 import CabeceraVolver from "@/components/movil/cabecera-volver";
 import MediosPago from "@/components/movil/medios-pago";
+import ProgramarCard, { PROGRAMACION_VACIA, type Programacion } from "@/components/movil/programar";
 import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
@@ -43,6 +44,7 @@ export default function Solicitud() {
   const [destino, setDestino] = useState("");
   const [material, setMaterial] = useState("Materiales");
   const [prog, setProg] = useState("Ahora");
+  const [programacion, setProgramacion] = useState<Programacion>(PROGRAMACION_VACIA);
   const [peso, setPeso] = useState("12");
   const [unidad, setUnidad] = useState("Ton");
   const [condiciones, setCondiciones] = useState<string[]>([]);
@@ -134,6 +136,7 @@ export default function Solicitud() {
                     );
                   })}
                 </View>
+                {prog === "Programar" && <ProgramarCard valor={programacion} onCambio={setProgramacion} />}
               </View>
             </>
           )}
@@ -218,7 +221,7 @@ export default function Solicitud() {
           </View>
           <BotonPill
             color={C.oliva}
-            disabled={paso === 1 && destino.trim() === ""}
+            disabled={paso === 1 && (destino.trim() === "" || (prog === "Programar" && (!programacion.fecha || !programacion.hora)))}
             onPress={() => setPaso((p) => (p === 1 ? 2 : 3))}
             className="px-9 py-4"
             textClassName="text-[15px]"

@@ -106,7 +106,7 @@ export default function DashboardOverview() {
       {paso !== null && <TarjetaGuia paso={paso} setPaso={setPaso} />}
 
       {/* Banner de bienvenida */}
-      <View style={SOMBRA.alta} className={`rounded-3xl border border-white/30 bg-primary-300/80 p-8 ${resaltado(0)}`}>
+      <View style={SOMBRA.alta} className={`rounded-3xl bg-[#556B2F] p-8 ${resaltado(0)}`}>
         <Texto className="text-xs font-semibold uppercase tracking-widest text-white/85">Bienvenido Nuevamente</Texto>
         <Texto className="mt-2 font-sans text-3xl font-bold text-white">José Pérez Guzmán</Texto>
         <BotonPill color="#20221f" onPress={() => setPaso(0)} className="mt-6 self-start px-5 py-2.5">

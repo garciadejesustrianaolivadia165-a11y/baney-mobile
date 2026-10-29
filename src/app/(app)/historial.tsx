@@ -1,22 +1,22 @@
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
+import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
+import { pesos, VIAJES_HISTORIAL } from "@/lib/viajes";
 
-const COMPLETADOS = [
-  { n: "Arena Azul – 12m³", f: "15 Oct 2023 • 09:45 AM", de: "La Romana, Rep. Dom.", a: "Santo Domingo Este, Rep. Dom.", p: "RD$ 5,200.00" },
-  { n: 'Blocks 6" – 2,000 unid.', f: "12 Oct 2023 • 14:20 PM", de: "Santiago De Los Caballeros", a: "Punta Cana, Rep. Dom.", p: "RD$ 12,800.00" },
-];
-const CANCELADOS = [
-  { n: "Grava – 8m³", f: "3 Oct 2023 • 10:10 AM", de: "Haina, Rep. Dom.", a: "Baní, Rep. Dom.", p: "RD$ 3,100.00" },
-];
+// Cada viaje del historial abre el mismo "Detalle del viaje" que una solicitud
+const viajeAFila = (v: (typeof VIAJES_HISTORIAL)[number]) => ({ id: v.id, n: v.detalle, f: v.fecha ?? "", de: v.origen, a: v.destino, p: pesos(v.precio + v.servicio + v.seguro) });
+const COMPLETADOS = VIAJES_HISTORIAL.filter((v) => v.estado === "Entregado").map(viajeAFila);
+const CANCELADOS = VIAJES_HISTORIAL.filter((v) => v.estado === "Cancelado").map(viajeAFila);
 
 // ============ VISTA 10: HISTORIAL ============
 export default function Historial() {
+  const router = useRouter();
   const [tab, setTab] = useState<"Completados" | "Cancelados">("Completados");
   const viajes = tab === "Completados" ? COMPLETADOS : CANCELADOS;
 
@@ -43,7 +43,7 @@ export default function Historial() {
 
         <View className="gap-5 pt-4">
           {viajes.map((v) => (
-            <View key={v.n} style={SOMBRA.suave} className="rounded-2xl border border-[#EDEFEB] bg-white px-5 py-5">
+            <Pressable key={v.id} accessibilityRole="button" accessibilityLabel={`Ver detalle de ${v.n}`} onPress={() => router.push({ pathname: "/viaje/[id]", params: { id: v.id } })} style={SOMBRA.suave} className="rounded-2xl border border-[#EDEFEB] bg-white px-5 py-5 active:bg-neutral-50">
               <View className="flex-row items-start gap-3.5">
                 <View className="h-11 w-11 items-center justify-center rounded-xl bg-[#FDE7E7]">
                   <Icono d={ICONOS.camion} size={22} color="#4A5720" strokeWidth={1.7} />
@@ -75,11 +75,11 @@ export default function Historial() {
 
               <View className="mt-5 flex-row items-center justify-between border-t border-[#EDEFEB] pt-4">
                 <Texto className="text-[19px] font-bold text-[#16202E]">{v.p}</Texto>
-                <BotonPill color="#8B9A3A" variante="borde" textoColor="#4A5720" className="px-6 py-2.5" textClassName="text-[14px] font-semibold" sinSombra>
+                <BotonPill color="#8B9A3A" variante="borde" textoColor="#4A5720" onPress={() => router.push({ pathname: "/viaje/[id]", params: { id: v.id } })} className="px-6 py-2.5" textClassName="text-[14px] font-semibold" sinSombra>
                   Detalles
                 </BotonPill>
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
       </ScrollView>

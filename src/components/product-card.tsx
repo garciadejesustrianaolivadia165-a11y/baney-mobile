@@ -47,7 +47,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {acciones && (
           <View className="absolute inset-0 items-center justify-center gap-3 bg-black/40">
             <Accion icono={IMAGENES["/images/image_home/Icono_01.png"]} texto="Comprar Ahora" className="bg-primary-600" onPress={() => router.push({ pathname: "/checkout/carrito", params: { producto: product.id } })} />
-            <Accion icono={IMAGENES["/images/image_home/Icono_02.png"]} texto="Ver mas detalles" className="bg-primary-400/90" onPress={() => router.push({ pathname: "/marketplace/producto/[id]", params: { id: product.id } })} />
+            <Accion icono={IMAGENES["/images/image_home/Icono_02.png"]} texto="Ver mas detalles" className="bg-primary-400/90" onPress={() => router.push({ pathname: "/cliente/producto/[id]", params: { id: product.id } })} />
             <Accion icono={IMAGENES["/images/image_home/Icono_03.png"]} texto="Añadir al Carrito" className="border-2 border-white bg-transparent" />
           </View>
         )}

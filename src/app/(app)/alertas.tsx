@@ -58,17 +58,10 @@ function Tarjeta({
   );
 }
 
-// ============ VISTA 11: NOTIFICACIONES ============
-export default function Alertas() {
+/** Lista de notificaciones (la comparten la pestaña Alertas y la campanita del cliente) */
+export function ListaAlertas() {
   return (
-    <SafeAreaView edges={["top"]} className="flex-1 bg-[#FBFBFA]">
-      <ScrollView contentContainerClassName="px-4 pb-4 pt-8" showsVerticalScrollIndicator={false}>
-        <View className="flex-row items-center justify-between px-1">
-          <Texto className="text-[28px] font-bold text-[#16202E]">Notificaciones</Texto>
-          <Pressable accessibilityRole="button" className="active:scale-105">
-            <Texto className="text-[14px] font-semibold text-[#4A5720]">Marcar leídas</Texto>
-          </Pressable>
-        </View>
+    <>
 
         <Texto className="px-1 pt-6 text-[12px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">Hoy</Texto>
         <Tarjeta
@@ -105,6 +98,22 @@ export default function Alertas() {
           hora="Ayer, 02:15 PM"
           texto="Tu cuenta ha sido verificada satisfactoriamente. ¡Bienvenido a Match Truck!"
         />
+    </>
+  );
+}
+
+// ============ VISTA 11: NOTIFICACIONES ============
+export default function Alertas() {
+  return (
+    <SafeAreaView edges={["top"]} className="flex-1 bg-[#FBFBFA]">
+      <ScrollView contentContainerClassName="px-4 pb-4 pt-8" showsVerticalScrollIndicator={false}>
+        <View className="flex-row items-center justify-between px-1">
+          <Texto className="text-[28px] font-bold text-[#16202E]">Notificaciones</Texto>
+          <Pressable accessibilityRole="button" className="active:scale-105">
+            <Texto className="text-[14px] font-semibold text-[#4A5720]">Marcar leídas</Texto>
+          </Pressable>
+        </View>
+        <ListaAlertas />
       </ScrollView>
     </SafeAreaView>
   );

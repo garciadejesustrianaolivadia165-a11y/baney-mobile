@@ -14,10 +14,17 @@ import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { CATEGORIAS_PROD, ESTADOS, FOTOS, UNIDADES, agregarProducto, colorEstado, eliminarProducto, useMisProductos, type Estado } from "@/lib/mis-productos";
 
-/** Galería de fotos seleccionables (las subidas primero) */
-export function GaleriaFotos({ fotos, foto, onFoto }: { fotos: string[]; foto: string; onFoto: (f: string) => void }) {
+/** Galería de fotos seleccionables (las subidas primero); el recuadro "+" abre la galería del teléfono */
+export function GaleriaFotos({ fotos, foto, onFoto, onSubir }: { fotos: string[]; foto: string; onFoto: (f: string) => void; onSubir?: (uri: string) => void }) {
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-4 pb-1">
+      {onSubir && (
+        <SubirFoto etiqueta="Subir foto desde mi dispositivo" onFoto={onSubir}>
+          <View className="h-20 w-28 items-center justify-center rounded-2xl border-2 border-dashed border-[#9EAA31] bg-primary-50/40">
+            <Icono d={ICONOS.mas} size={28} color="#9EAA31" strokeWidth={1.8} />
+          </View>
+        </SubirFoto>
+      )}
       {fotos.map((f) => (
         <Pressable
           key={f}
@@ -133,17 +140,16 @@ export default function MisProductos() {
             <Campo label={`Existencia disponible (${unidad})`} value={stock} onChange={(t) => setStock(t.replace(/[^\d]/g, ""))} placeholder="0" redondo={false} keyboardType="number-pad" />
             <Desplegable label="Estado de publicación" etiqueta="Estado de publicación" valor={nuevoEstado} opciones={ESTADOS} onCambio={(v) => setNuevoEstado(v as Estado)} />
             <View>
-              <View className="mb-3 flex-row flex-wrap items-center justify-between gap-3">
-                <Texto className="text-sm text-[#3F443D]">Foto del producto</Texto>
-                <SubirFoto
-                  etiqueta="Subir desde mi dispositivo"
-                  onFoto={(uri) => {
-                    setSubidas((prev) => [uri, ...prev]);
-                    setFoto(uri);
-                  }}
-                />
-              </View>
-              <GaleriaFotos fotos={[...subidas, ...FOTOS]} foto={foto} onFoto={setFoto} />
+              <Texto className="mb-3 text-sm text-[#3F443D]">Foto del producto</Texto>
+              <GaleriaFotos
+                fotos={[...subidas, ...FOTOS]}
+                foto={foto}
+                onFoto={setFoto}
+                onSubir={(uri) => {
+                  setSubidas((prev) => [uri, ...prev]);
+                  setFoto(uri);
+                }}
+              />
             </View>
           </View>
           <View className="mt-6 flex-row flex-wrap gap-4">
@@ -157,7 +163,8 @@ export default function MisProductos() {
         </View>
       )}
 
-      {/* Filtros */}
+      {/* Filtros y listado (ocultos mientras se agrega un producto) */}
+      {!formulario && (<>
       <View className="gap-4">
         <View className="flex-row items-center gap-3 rounded-full border border-[#9EAA31] bg-white px-5 py-3">
           <Icono d="M21 21l-4.35-4.35" circulos={[[11, 11, 7]]} size={16} color="#a2a79e" strokeWidth={2} />
@@ -202,6 +209,7 @@ export default function MisProductos() {
           ))}
         </View>
       )}
+      </>)}
     </Pagina>
   );
 }

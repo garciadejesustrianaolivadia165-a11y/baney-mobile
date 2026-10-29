@@ -4,7 +4,11 @@ import { useRouter, usePathname, type Href } from "expo-router";
 
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
-import { IMAGENES } from "@/lib/imagenes";
+import { imagen, IMAGENES } from "@/lib/imagenes";
+import { PROVEEDORES_TOP } from "@/lib/pedidos-cliente";
+import BotonPill from "@/components/movil/boton-pill";
+
+export type RolPanel = "proveedor" | "cliente";
 import { SOMBRA } from "@/lib/estilos";
 
 const IMG = "/images/image_home";
@@ -15,17 +19,33 @@ const iconos = {
   movil: "M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM11 18h2",
 };
 
-// Íconos oficiales del diseño (assets/images)
-const panelGeneral: { label: string; href: Href; ruta: string; icon?: number; svg?: string; exacta?: boolean }[] = [
-  { label: "Inicio", href: "/dashboard", ruta: "/dashboard", icon: IMAGENES["/images/home.png"], exacta: true },
-  { label: "Bandeja de entrada", href: "/dashboard/bandeja", ruta: "/dashboard/bandeja", icon: IMAGENES["/images/direct-inbox.png"] },
-  { label: "Finanzas", href: "/dashboard/finanzas", ruta: "/dashboard/finanzas", icon: IMAGENES["/images/folder-open.png"] },
-  { label: "Mis productos", href: "/dashboard/productos", ruta: "/dashboard/productos", icon: IMAGENES["/images/task-square.png"] },
-  { label: "Marketplace", href: "/marketplace", ruta: "/marketplace", icon: IMAGENES["/images/folder-open.png"] },
-  { label: "Clientes", href: "/dashboard/clientes", ruta: "/dashboard/clientes", icon: IMAGENES["/images/people.png"] },
-  { label: "Rutas", href: "/dashboard/rutas", ruta: "/dashboard/rutas", icon: IMAGENES["/images/people.png"] },
-  { label: "Mobile", href: "/onboarding", ruta: "/onboarding", svg: iconos.movil },
-];
+type Item = { label: string; href: Href; ruta: string; icon?: number; svg?: string; exacta?: boolean };
+
+// Íconos oficiales del diseño (assets/images). El proveedor no ve el Marketplace:
+// su catálogo es "Mis productos". El cliente tiene el Marketplace como inicio.
+const PANEL: Record<RolPanel, Item[]> = {
+  proveedor: [
+    { label: "Inicio", href: "/dashboard", ruta: "/dashboard", icon: IMAGENES["/images/home.png"], exacta: true },
+    { label: "Bandeja de entrada", href: "/dashboard/bandeja", ruta: "/dashboard/bandeja", icon: IMAGENES["/images/direct-inbox.png"] },
+    { label: "Finanzas", href: "/dashboard/finanzas", ruta: "/dashboard/finanzas", icon: IMAGENES["/images/folder-open.png"] },
+    { label: "Mis productos", href: "/dashboard/productos", ruta: "/dashboard/productos", icon: IMAGENES["/images/task-square.png"] },
+    { label: "Clientes", href: "/dashboard/clientes", ruta: "/dashboard/clientes", icon: IMAGENES["/images/people.png"] },
+    { label: "Rutas", href: "/dashboard/rutas", ruta: "/dashboard/rutas", icon: IMAGENES["/images/people.png"] },
+    { label: "Mobile", href: "/onboarding", ruta: "/onboarding", svg: iconos.movil },
+  ],
+  cliente: [
+    { label: "Marketplace", href: "/cliente", ruta: "/cliente", icon: IMAGENES["/images/home.png"], exacta: true },
+    { label: "Historial", href: "/cliente/historial", ruta: "/cliente/historial", icon: IMAGENES["/images/task-square.png"] },
+    { label: "Notificaciones", href: "/cliente/notificaciones", ruta: "/cliente/notificaciones", icon: IMAGENES["/images/direct-inbox.png"] },
+  ],
+};
+const CONFIG: Record<RolPanel, Item[]> = {
+  proveedor: [{ label: "Configuración", href: "/dashboard/configuracion", ruta: "/dashboard/configuracion", svg: iconos.config }],
+  cliente: [
+    { label: "Métodos de pago", href: "/cliente/pagos", ruta: "/cliente/pagos", svg: ICONOS.tarjeta },
+    { label: "Configuración", href: "/cliente/configuracion", ruta: "/cliente/configuracion", svg: iconos.config },
+  ],
+};
 
 const proveedores = [
   { id: "maria-perez", nombre: "Maria Perez", lugar: "San Juan De La Maguana", img: `${IMG}/image_home_11.png` },
@@ -35,16 +55,17 @@ const proveedores = [
 
 // Menú lateral del dashboard. En teléfono se abre como cajón desde el botón de
 // menú de dashboard/_layout.tsx; a partir de 1024 px va fijo a la izquierda.
-export default function Sidebar({ abierto = false, onCerrar, fijo = false }: { abierto?: boolean; onCerrar?: () => void; fijo?: boolean }) {
+export default function Sidebar({ abierto = false, onCerrar, fijo = false, rol = "proveedor" }: { abierto?: boolean; onCerrar?: () => void; fijo?: boolean; rol?: RolPanel }) {
   const router = useRouter();
   const ruta = usePathname();
+  const panelGeneral = PANEL[rol];
   if (!fijo && !abierto) return null;
 
   const ir = (href: Href) => {
     onCerrar?.();
     router.push(href);
   };
-  const activo = (item: (typeof panelGeneral)[number]) => (item.exacta ? ruta === item.ruta : ruta.startsWith(item.ruta));
+  const activo = (item: Item) => (item.exacta ? ruta === item.ruta : ruta.startsWith(item.ruta));
 
   const panel = (
     <ScrollView
@@ -53,7 +74,7 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false }: { a
       contentContainerClassName="flex-grow p-6"
       showsVerticalScrollIndicator={false}
     >
-      <Pressable accessibilityRole="link" onPress={() => ir("/home")}>
+      <Pressable accessibilityRole="link" onPress={() => ir(rol === "cliente" ? "/cliente" : "/home")}>
         <Image source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]} accessibilityLabel="BANEY" contentFit="contain" style={{ width: 146, height: 44 }} />
       </Pressable>
 
@@ -67,6 +88,26 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false }: { a
         ))}
       </View>
 
+      {rol === "cliente" ? (
+        <>
+          <Texto className="mt-16 text-[17px] font-bold text-[#3F443D]">TUS TOP 3 PROVEEDORES</Texto>
+          <View className="mt-5 gap-4">
+            {PROVEEDORES_TOP.map((p) => (
+              <View key={p.id} className="flex-row items-center gap-3 px-1">
+                <Image source={imagen(p.img)} accessibilityLabel={p.nombre} contentFit="cover" style={{ width: 36, height: 36, borderRadius: 18 }} />
+                <View className="min-w-0 flex-1">
+                  <Texto numberOfLines={1} className="text-sm font-semibold text-[#3F443D]">{p.nombre}</Texto>
+                  <Texto numberOfLines={1} className="text-xs text-neutral-500">{p.pedidos} pedidos · {p.lugar}</Texto>
+                </View>
+                <BotonPill color="#b1864e" onPress={() => ir("/cliente")} className="px-3 py-1.5" textClassName="text-[11px]" sinSombra>
+                  Pedir de nuevo
+                </BotonPill>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : (
+      <>
       <Texto className="mt-16 text-[17px] font-bold text-[#3F443D]">OTROS PROVEEDORES</Texto>
       <View className="mt-5 gap-4">
         {proveedores.map((p) => (
@@ -79,14 +120,18 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false }: { a
           </Pressable>
         ))}
       </View>
+      </>
+      )}
 
       <View className="mt-auto pt-10">
         <Texto className="text-[17px] font-bold text-[#3F443D]">CONFIGURACIÓN</Texto>
         <View className="mt-5 gap-3">
-          <Pressable accessibilityRole="link" onPress={() => ir("/dashboard/configuracion")} className="flex-row items-center gap-3 px-1 py-2.5 active:opacity-60">
-            <Icono d={iconos.config} size={20} color={ruta.startsWith("/dashboard/configuracion") ? "#5d7f4d" : "#3F443D"} />
-            <Texto className={`text-base font-medium ${ruta.startsWith("/dashboard/configuracion") ? "text-primary-400" : "text-[#3F443D]"}`}>Configuración</Texto>
-          </Pressable>
+          {CONFIG[rol].map((item) => (
+            <Pressable key={item.label} accessibilityRole="link" onPress={() => ir(item.href)} className="flex-row items-center gap-3 px-1 py-2.5 active:opacity-60">
+              <Icono d={item.svg ?? ""} size={20} color={activo(item) ? "#5d7f4d" : "#3F443D"} />
+              <Texto className={`text-base font-medium ${activo(item) ? "text-primary-400" : "text-[#3F443D]"}`}>{item.label}</Texto>
+            </Pressable>
+          ))}
           <Pressable accessibilityRole="link" onPress={() => ir("/landing")} className="flex-row items-center gap-3 px-1 py-2.5 active:opacity-60">
             <Icono d={ICONOS.salir} size={20} color="#ef4444" />
             <Texto className="text-[15px] font-medium text-error-500">Cerrar Sección</Texto>

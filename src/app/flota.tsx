@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import BotonPill from "@/components/movil/boton-pill";
 import CabeceraVolver from "@/components/movil/cabecera-volver";
+import ProgramarCard, { PROGRAMACION_VACIA, type Programacion } from "@/components/movil/programar";
 import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
@@ -32,6 +33,7 @@ export default function Flota() {
   const flota = useFlota();
   const [camion, setCamion] = useState(flota[0]?.alias ?? "");
   const [horario, setHorario] = useState("Ahora mismo");
+  const [programacion, setProgramacion] = useState<Programacion>(PROGRAMACION_VACIA);
   const [precio, setPrecio] = useState("");
   const [enfocado, setEnfocado] = useState(false);
   const volver = () => router.navigate("/transportista");
@@ -94,6 +96,7 @@ export default function Flota() {
               );
             })}
           </View>
+          {horario === "Más tarde" && <ProgramarCard valor={programacion} onCambio={setProgramacion} />}
         </View>
 
         {/* 4. Precio base */}

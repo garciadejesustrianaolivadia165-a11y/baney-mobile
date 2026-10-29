@@ -12,6 +12,7 @@ import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { buscarViaje, pesos } from "@/lib/viajes";
+import { useSesion } from "@/lib/sesion";
 
 const ICONO_MATERIAL: Record<string, string> = {
   Materiales: "M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9zM8 9V7a4 4 0 0 1 8 0v2",
@@ -50,6 +51,8 @@ export default function DetalleViaje() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const viaje = buscarViaje(id);
+  const { rol } = useSesion();
+  const historico = !!viaje?.estado;
 
   if (!viaje) {
     return (
@@ -80,8 +83,8 @@ export default function DetalleViaje() {
               <Texto className="text-[13px] font-bold text-[#16202E]">{viaje.destino}</Texto>
             </View>
           </View>
-          <View className={`absolute right-4 top-4 rounded-md px-2.5 py-1 ${viaje.tono === "ok" ? "bg-success-100" : "bg-warning-100"}`}>
-            <Texto className={`text-[11px] font-semibold ${viaje.tono === "ok" ? "text-success-700" : "text-warning-800"}`}>{viaje.chip}</Texto>
+          <View className={`absolute right-4 top-4 rounded-md px-2.5 py-1 ${viaje.estado === "Cancelado" ? "bg-error-100" : viaje.tono === "ok" ? "bg-success-100" : "bg-warning-100"}`}>
+            <Texto className={`text-[11px] font-semibold ${viaje.estado === "Cancelado" ? "text-error-600" : viaje.tono === "ok" ? "text-success-700" : "text-warning-800"}`}>{viaje.chip}</Texto>
           </View>
         </View>
 
@@ -92,7 +95,8 @@ export default function DetalleViaje() {
             <View className="min-w-0 flex-1">
               <Texto className="text-[17px] font-bold leading-tight text-[#16202E]">{viaje.cliente}</Texto>
               <Texto className="mt-0.5 text-[13px] text-[#6B7688]">{viaje.empresa}</Texto>
-              <Texto className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#9AA3AF]">Publicado {viaje.publicado}</Texto>
+              <Texto className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#9AA3AF]">{historico ? viaje.fecha : `Publicado ${viaje.publicado}`}</Texto>
+              {viaje.transportista && <Texto className="mt-1 text-[12px] text-[#4A5720]">Transportista: {viaje.transportista}</Texto>}
             </View>
             {[
               { l: "Llamar", d: ICONOS.llamar },
@@ -178,20 +182,33 @@ export default function DetalleViaje() {
               <Fila k="Total del viaje" v={pesos(total)} fuerte />
             </View>
             <View className="mt-2 flex-row items-center justify-between rounded-2xl bg-[#E6EAE0] px-4 py-3">
-              <Texto className="text-[13px] text-[#3F4A20]">Tu ganancia estimada</Texto>
-              <Texto className="text-[18px] font-bold text-[#4A5720]">{pesos(viaje.precio)}</Texto>
+              <Texto className="text-[13px] text-[#3F4A20]">{rol === "transportista" ? "Tu ganancia estimada" : historico ? (viaje.estado === "Cancelado" ? "Sin cargo" : "Total pagado") : "Total a pagar"}</Texto>
+              <Texto className="text-[18px] font-bold text-[#4A5720]">{rol === "transportista" ? pesos(viaje.precio) : viaje.estado === "Cancelado" ? pesos(0) : pesos(total)}</Texto>
             </View>
           </Tarjeta>
         </View>
       </ScrollView>
 
       <View className="flex-row gap-3 border-t border-[#EDEFEB] bg-white px-5 py-5">
-        <BotonPill color={C.oliva} onPress={() => router.replace("/transportista-mapa")} className="flex-1 py-4" textClassName="text-[15px]">
-          Aceptar viaje
-        </BotonPill>
-        <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => router.back()} className="px-6 py-4" textClassName="text-[15px]" sinSombra>
-          Rechazar
-        </BotonPill>
+        {historico ? (
+          <>
+            <BotonPill color={C.oliva} onPress={() => router.push(rol === "transportista" ? "/flota" : "/solicitud")} className="flex-1 py-4" textClassName="text-[15px]">
+              {rol === "transportista" ? "Publicar disponibilidad" : "Pedir de nuevo"}
+            </BotonPill>
+            <BotonPill color="#EDEFEB" variante="borde" textoColor={C.tinta} onPress={() => router.back()} className="px-6 py-4" textClassName="text-[15px]" sinSombra>
+              Volver
+            </BotonPill>
+          </>
+        ) : (
+          <>
+            <BotonPill color={C.oliva} onPress={() => router.replace("/transportista-mapa")} className="flex-1 py-4" textClassName="text-[15px]">
+              Aceptar viaje
+            </BotonPill>
+            <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => router.back()} className="px-6 py-4" textClassName="text-[15px]" sinSombra>
+              Rechazar
+            </BotonPill>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );

@@ -160,7 +160,7 @@ export default function Home() {
           <View className="w-full px-8 py-16">
             <View className="flex-row items-end justify-between">
               <Texto className="font-sans text-lg font-bold tracking-wide text-neutral-900">NUESTROS PRODUCTOS</Texto>
-              <Pressable accessibilityRole="link" onPress={() => router.push("/marketplace")}>
+              <Pressable accessibilityRole="link" onPress={() => router.push("/cliente")}>
                 <Texto className="font-sans text-sm font-semibold text-neutral-900 underline">Ver Todos ›</Texto>
               </Pressable>
             </View>

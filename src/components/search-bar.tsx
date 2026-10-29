@@ -10,7 +10,7 @@ export default function SearchBar({ placeholder = "Buscar", className = "" }: { 
 
   function buscar() {
     const q = query.trim();
-    if (q) router.push({ pathname: "/marketplace", params: { q } });
+    if (q) router.push({ pathname: "/cliente", params: { q } });
   }
 
   return (

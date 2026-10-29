@@ -22,7 +22,7 @@ export default function Auth() {
   function completarAuth() {
     if (rol === "proveedor") router.replace("/dashboard");
     else if (rol === "transportista") router.replace("/transportista");
-    else if (busca === "productor") router.replace("/marketplace");
+    else if (busca === "productor") router.replace("/cliente");
     else router.replace("/mapa");
   }
 

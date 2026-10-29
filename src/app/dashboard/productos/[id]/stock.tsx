@@ -7,7 +7,6 @@ import { Campo, Desplegable } from "@/components/dashboard/campo";
 import Pagina from "@/components/dashboard/pagina";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
-import SubirFoto from "@/components/ui/subir-foto";
 import Texto from "@/components/ui/texto";
 import { imagen } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
@@ -138,18 +137,17 @@ export default function EditarProducto() {
           <Campo label={`Precio por ${unidad.toLowerCase()} (RD$)`} value={precio} onChange={(t) => { setPrecio(t.replace(/[^\d.]/g, "")); tocar(); }} redondo={false} keyboardType="decimal-pad" />
           <Desplegable label="Estado de publicación" etiqueta="Estado de publicación" valor={estado} opciones={ESTADOS} onCambio={(v) => { setEstado(v as Estado); tocar(); }} />
           <View>
-            <View className="mb-3 flex-row flex-wrap items-center justify-between gap-3">
-              <Texto className="text-sm text-[#3F443D]">Foto del producto</Texto>
-              <SubirFoto
-                etiqueta="Subir desde mi dispositivo"
-                onFoto={(uri) => {
-                  setSubidas((prev) => [uri, ...prev]);
-                  setFoto(uri);
-                  tocar();
-                }}
-              />
-            </View>
-            <GaleriaFotos fotos={galeria} foto={foto} onFoto={(f) => { setFoto(f); tocar(); }} />
+            <Texto className="mb-3 text-sm text-[#3F443D]">Foto del producto</Texto>
+            <GaleriaFotos
+              fotos={galeria}
+              foto={foto}
+              onFoto={(f) => { setFoto(f); tocar(); }}
+              onSubir={(uri) => {
+                setSubidas((prev) => [uri, ...prev]);
+                setFoto(uri);
+                tocar();
+              }}
+            />
           </View>
         </View>
 

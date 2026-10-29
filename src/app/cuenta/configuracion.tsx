@@ -10,8 +10,8 @@ import { ICONOS } from "@/components/ui/icono";
 import { SOMBRA } from "@/lib/estilos";
 import { cerrarSesion } from "@/lib/sesion";
 
-// Perfil → Configuración: notificaciones y seguridad
-export default function Configuracion() {
+/** Notificaciones y seguridad (lo comparten Perfil → Configuración y el menú del cliente) */
+export function ConfiguracionContenido() {
   const router = useRouter();
   const [push, setPush] = useState(true);
   const [correo, setCorreo] = useState(true);
@@ -22,9 +22,7 @@ export default function Configuracion() {
   const [nueva, setNueva] = useState("");
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <CabeceraVolver titulo="Configuración" onVolver={() => router.back()} />
-      <ScrollView contentContainerClassName="gap-7 px-5 py-6" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <>
         <View>
           <Paso>Notificaciones</Paso>
           <View style={SOMBRA.alta} className="mt-4 overflow-hidden rounded-[24px] bg-white">
@@ -62,6 +60,18 @@ export default function Configuracion() {
         <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => { cerrarSesion(); router.replace("/"); }} className="w-full py-3.5" textClassName="text-[15px]" sinSombra>
           Cerrar sesión
         </BotonPill>
+    </>
+  );
+}
+
+// Perfil → Configuración: notificaciones y seguridad
+export default function Configuracion() {
+  const router = useRouter();
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <CabeceraVolver titulo="Configuración" onVolver={() => router.back()} />
+      <ScrollView contentContainerClassName="gap-7 px-5 py-6" keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        <ConfiguracionContenido />
       </ScrollView>
     </SafeAreaView>
   );
