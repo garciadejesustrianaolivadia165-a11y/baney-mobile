@@ -22,6 +22,16 @@ Compilar APK/IPA en la nube, sin Android Studio ni Xcode:
 npx eas-cli@latest build -p android --profile preview
 ```
 
+## Ver la app en el teléfono (sin instalar nada en tu PC)
+
+1. Instala **Expo Go** en el teléfono (Play Store / App Store).
+2. En GitHub abre este repo → botón **Code** → pestaña **Codespaces** → **Create codespace on main**. Espera a que termine `npm install` (1-2 min).
+3. En la terminal del Codespace ejecuta `npm run tunnel`.
+4. Cuando aparezca el QR, en Expo Go toca **Scan QR** (o copia la URL `exp://...` de la terminal y usa **Enter URL**).
+5. Cada cambio guardado en el Codespace se recarga solo en el teléfono.
+
+El túnel hace falta porque el teléfono y el Codespace no están en la misma red. El paquete `@expo/ngrok` ya está en las devDependencies para que no pida instalarlo.
+
 ## Estructura
 
 - `src/app/` — pantallas (Expo Router, rutas por archivo; `_layout.tsx` define navegadores)

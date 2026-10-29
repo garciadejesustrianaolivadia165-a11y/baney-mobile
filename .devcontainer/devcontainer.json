@@ -1,0 +1,14 @@
+{
+  "name": "baney-mobile (Expo)",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm install",
+  "forwardPorts": [8081],
+  "portsAttributes": {
+    "8081": { "label": "Metro (Expo)", "onAutoForward": "silent" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["expo.vscode-expo-tools", "bradlc.vscode-tailwindcss", "esbenp.prettier-vscode"]
+    }
+  }
+}
