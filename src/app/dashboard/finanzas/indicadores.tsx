@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import { formatearPeriodo as formatear } from "@/components/dashboard/filtro-periodo";
 import { TarjetaTotal } from "@/components/dashboard/graficos";
-import Pagina from "@/components/dashboard/pagina";
+import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import { GraficoPedidos, GraficoStatus, GraficoTotalReal, GraficoVentas, TARJETAS_TOTALES } from "./index";
 
 export default function FinanceIndicators() {
@@ -14,6 +14,7 @@ export default function FinanceIndicators() {
 
   return (
     <Pagina>
+      <TituloSeccion titulo="Indicadores" enlace="Volver Atrás" href="/dashboard/finanzas" />
       <View className="gap-6">
         {TARJETAS_TOTALES.map((t) => (
           <TarjetaTotal key={t.label} {...t} />

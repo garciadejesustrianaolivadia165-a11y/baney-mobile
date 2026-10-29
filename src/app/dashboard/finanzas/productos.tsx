@@ -4,7 +4,7 @@ import { Image } from "expo-image";
 
 import FiltroPeriodo from "@/components/dashboard/filtro-periodo";
 import { AnilloProgreso, Area, BotonPeriodo, Estrellas, Sparkline, Tabs, Tarjeta } from "@/components/dashboard/graficos";
-import Pagina from "@/components/dashboard/pagina";
+import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import { CalendarioFiltro } from "@/components/dashboard/search-header";
 import Icono from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
@@ -112,7 +112,8 @@ export default function ProductIndicators() {
   const rango = `${inicio.getDate()} de ${MESES_ES[inicio.getMonth()]} ${inicio.getFullYear()} - ${fin.getDate()} de ${MESES_ES[fin.getMonth()]} ${fin.getFullYear()}`;
 
   return (
-    <Pagina buscador>
+    <Pagina>
+      <TituloSeccion titulo="Indicadores de productos" enlace="Volver Atrás" href="/dashboard/finanzas" />
       <View className="flex-row flex-wrap items-center justify-between gap-4" style={{ zIndex: calAbierto ? 50 : 1 }}>
         <Texto className="max-w-64 font-sans text-xl leading-snug text-neutral-500">Resumen de stock por producto registrados</Texto>
         <View>

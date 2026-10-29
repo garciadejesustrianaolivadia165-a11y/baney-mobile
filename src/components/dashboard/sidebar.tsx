@@ -32,7 +32,6 @@ const PANEL: Record<RolPanel, Item[]> = {
     { label: "Mis productos", href: "/dashboard/productos", ruta: "/dashboard/productos", icon: IMAGENES["/images/task-square.png"] },
     { label: "Clientes", href: "/dashboard/clientes", ruta: "/dashboard/clientes", icon: IMAGENES["/images/people.png"] },
     { label: "Rutas", href: "/dashboard/rutas", ruta: "/dashboard/rutas", icon: IMAGENES["/images/people.png"] },
-    { label: "Mobile", href: "/onboarding", ruta: "/onboarding", svg: iconos.movil },
   ],
   cliente: [
     { label: "Marketplace", href: "/cliente", ruta: "/cliente", icon: IMAGENES["/images/home.png"], exacta: true },
@@ -119,7 +118,7 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false, rol =
       <Texto className="mt-16 text-[17px] font-bold text-[#3F443D]">OTROS PROVEEDORES</Texto>
       <View className="mt-5 gap-4">
         {proveedores.map((p) => (
-          <Pressable key={p.nombre} accessibilityRole="link" onPress={() => ir({ pathname: "/dashboard/clientes/[id]", params: { id: p.id } })} className="flex-row items-center gap-3 px-1 active:opacity-60">
+          <Pressable key={p.nombre} accessibilityRole="link" onPress={() => ir({ pathname: "/dashboard/proveedores/[id]", params: { id: p.id } })} className="flex-row items-center gap-3 px-1 active:opacity-60">
             <Image source={IMAGENES[p.img as keyof typeof IMAGENES]} accessibilityLabel={p.nombre} contentFit="cover" style={{ width: 36, height: 36, borderRadius: 18 }} />
             <View className="min-w-0 flex-1">
               <Texto numberOfLines={1} className="text-sm font-semibold text-[#3F443D]">{p.nombre}</Texto>

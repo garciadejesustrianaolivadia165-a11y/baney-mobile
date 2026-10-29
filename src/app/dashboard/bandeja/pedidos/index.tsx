@@ -28,7 +28,7 @@ export default function InboxOrders() {
   }
 
   return (
-    <Pagina buscador>
+    <Pagina>
       <TituloSeccion titulo="Tus Pedidos" enlace="Volver Atras" href="/dashboard/bandeja" />
       <TablaPedidos
         pedidos={pedidos}

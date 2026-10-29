@@ -37,7 +37,7 @@ export default function RoutesList() {
   const router = useRouter();
 
   return (
-    <Pagina buscador>
+    <Pagina>
       <TituloSeccion titulo="Detalles De Pedido" enlace="Volver Atras" href="/home" />
 
       <View style={SOMBRA.card} className="rounded-3xl bg-white p-2">

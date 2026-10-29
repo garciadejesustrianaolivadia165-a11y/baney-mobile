@@ -3,7 +3,7 @@ import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 
-import { Campo, Desplegable } from "@/components/dashboard/campo";
+import { Desplegable } from "@/components/dashboard/campo";
 import { TarjetaTotal } from "@/components/dashboard/graficos";
 import Pagina from "@/components/dashboard/pagina";
 import BotonPill from "@/components/movil/boton-pill";
@@ -12,7 +12,7 @@ import SubirFoto from "@/components/ui/subir-foto";
 import Texto from "@/components/ui/texto";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
-import { CATEGORIAS_PROD, ESTADOS, FOTOS, UNIDADES, agregarProducto, colorEstado, eliminarProducto, useMisProductos, type Estado } from "@/lib/mis-productos";
+import { CATEGORIAS_PROD, ESTADOS, colorEstado, eliminarProducto, useMisProductos, type Estado } from "@/lib/mis-productos";
 
 /** Galería de fotos seleccionables (las subidas primero); el recuadro "+" abre la galería del teléfono */
 export function GaleriaFotos({ fotos, foto, onFoto, onSubir }: { fotos: string[]; foto: string; onFoto: (f: string) => void; onSubir?: (uri: string) => void }) {
@@ -57,19 +57,6 @@ export default function MisProductos() {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("Todas las categorías");
   const [estado, setEstado] = useState("Todos los estados");
-  const [formulario, setFormulario] = useState(false);
-
-  // Producto en creación
-  const [nombre, setNombre] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-  const [cat, setCat] = useState<string>(CATEGORIAS_PROD[0]);
-  const [unidad, setUnidad] = useState(UNIDADES[0]);
-  const [precio, setPrecio] = useState("");
-  const [stock, setStock] = useState("");
-  const [foto, setFoto] = useState(FOTOS[0]);
-  const [subidas, setSubidas] = useState<string[]>([]);
-  const [nuevoEstado, setNuevoEstado] = useState<Estado>("Publicado");
-
   const visibles = productos.filter((p) => {
     const coincide = p.nombre.toLowerCase().includes(busqueda.trim().toLowerCase());
     const porCategoria = categoria === "Todas las categorías" || p.categoria === categoria;
@@ -83,39 +70,21 @@ export default function MisProductos() {
     { label: "Borradores", valor: String(productos.filter((p) => p.estado === "Borrador").length), icono: IMAGENES["/icons/icon_03.png"] },
   ];
 
-  function limpiar() {
-    setNombre("");
-    setDescripcion("");
-    setCat(CATEGORIAS_PROD[0]);
-    setUnidad(UNIDADES[0]);
-    setPrecio("");
-    setStock("");
-    setFoto(FOTOS[0]);
-    setNuevoEstado("Publicado");
-  }
-
-  function guardar() {
-    if (nombre.trim() === "") return;
-    agregarProducto({ nombre: nombre.trim(), descripcion: descripcion.trim(), categoria: cat, unidad, precio: Number(precio) || 0, stock: Number(stock) || 0, estado: nuevoEstado, img: foto });
-    limpiar();
-    setFormulario(false);
-  }
-
   const irStock = (id: string) => router.push({ pathname: "/dashboard/productos/[id]/stock", params: { id } });
 
   return (
-    <Pagina buscador>
+    <Pagina>
       {/* Título y acción principal */}
       <View className="flex-row flex-wrap items-end justify-between gap-4">
         <View>
           <Texto className="text-2xl font-bold text-[#3F443D]">Mis productos</Texto>
           <Texto className="mt-1 text-sm text-neutral-500">Publica y administra el catálogo de tu negocio.</Texto>
         </View>
-        <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={() => setFormulario((f) => !f)} className="px-6 py-3" sinSombra>
+        <BotonPill color="#364a2d" textoColor="#fdf8f0" href="/dashboard/productos/nuevo" className="px-6 py-3" sinSombra>
           {(pressed) => (
             <View className="flex-row items-center gap-2">
               <Icono d={ICONOS.mas} size={16} color={pressed ? "#364a2d" : "#fdf8f0"} strokeWidth={2} />
-              <Texto className="text-sm font-semibold" style={{ color: pressed ? "#364a2d" : "#fdf8f0" }}>{formulario ? "Cerrar formulario" : "Agregar producto"}</Texto>
+              <Texto className="text-sm font-semibold" style={{ color: pressed ? "#364a2d" : "#fdf8f0" }}>Agregar producto</Texto>
             </View>
           )}
         </BotonPill>
@@ -127,44 +96,7 @@ export default function MisProductos() {
         ))}
       </View>
 
-      {/* Formulario de alta */}
-      {formulario && (
-        <View style={SOMBRA.alta} className="rounded-[2rem] bg-white p-6">
-          <Texto className="text-lg font-bold text-[#415936]">Nuevo producto</Texto>
-          <View className="mt-5 gap-5">
-            <Campo label="Nombre del producto" value={nombre} onChange={setNombre} placeholder="Ej: Aguacate Semil 34" redondo={false} />
-            <Desplegable label="Categoría" etiqueta="Categoría" valor={cat} opciones={CATEGORIAS_PROD} onCambio={setCat} />
-            <Campo label="Descripción" value={descripcion} onChange={setDescripcion} placeholder="Describe calidad, presentación y origen del producto." redondo={false} multiline />
-            <Desplegable label="Unidad de medida" etiqueta="Unidad de medida" valor={unidad} opciones={UNIDADES} onCambio={setUnidad} />
-            <Campo label={`Precio por ${unidad.toLowerCase()} (RD$)`} value={precio} onChange={(t) => setPrecio(t.replace(/[^\d.]/g, ""))} placeholder="0.00" redondo={false} keyboardType="decimal-pad" />
-            <Campo label={`Existencia disponible (${unidad})`} value={stock} onChange={(t) => setStock(t.replace(/[^\d]/g, ""))} placeholder="0" redondo={false} keyboardType="number-pad" />
-            <Desplegable label="Estado de publicación" etiqueta="Estado de publicación" valor={nuevoEstado} opciones={ESTADOS} onCambio={(v) => setNuevoEstado(v as Estado)} />
-            <View>
-              <Texto className="mb-3 text-sm text-[#3F443D]">Foto del producto</Texto>
-              <GaleriaFotos
-                fotos={[...subidas, ...FOTOS]}
-                foto={foto}
-                onFoto={setFoto}
-                onSubir={(uri) => {
-                  setSubidas((prev) => [uri, ...prev]);
-                  setFoto(uri);
-                }}
-              />
-            </View>
-          </View>
-          <View className="mt-6 flex-row flex-wrap gap-4">
-            <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={guardar} className="px-8 py-3" textClassName="text-sm" sinSombra>
-              Guardar producto
-            </BotonPill>
-            <BotonPill color="#486440" variante="borde" textoColor="#364a2d" onPress={() => { limpiar(); setFormulario(false); }} className="px-8 py-3" textClassName="text-sm" sinSombra>
-              Cancelar
-            </BotonPill>
-          </View>
-        </View>
-      )}
-
-      {/* Filtros y listado (ocultos mientras se agrega un producto) */}
-      {!formulario && (<>
+      {/* Filtros */}
       <View className="gap-4">
         <View className="flex-row items-center gap-3 rounded-full border border-[#9EAA31] bg-white px-5 py-3">
           <Icono d="M21 21l-4.35-4.35" circulos={[[11, 11, 7]]} size={16} color="#a2a79e" strokeWidth={2} />
@@ -209,7 +141,6 @@ export default function MisProductos() {
           ))}
         </View>
       )}
-      </>)}
     </Pagina>
   );
 }

@@ -3,7 +3,7 @@ import { View } from "react-native";
 
 import FiltroPeriodo from "@/components/dashboard/filtro-periodo";
 import { BarrasAgrupadas, BotonPeriodo, CabeceraGrafico, Leyenda, Medidor, Tarjeta } from "@/components/dashboard/graficos";
-import Pagina from "@/components/dashboard/pagina";
+import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import { CalendarioFiltro } from "@/components/dashboard/search-header";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono from "@/components/ui/icono";
@@ -44,6 +44,7 @@ export default function EconomicIndicators() {
 
   return (
     <Pagina>
+      <TituloSeccion titulo="Indicadores económicos" enlace="Volver Atrás" href="/dashboard/finanzas" />
       {/* Encabezado + filtro de períodos */}
       <View className="flex-row flex-wrap items-center justify-between gap-4" style={{ zIndex: calAbierto ? 50 : 1 }}>
         <Texto className="max-w-56 font-sans text-xl leading-snug text-neutral-500">Detalles de indicadores económicos</Texto>
