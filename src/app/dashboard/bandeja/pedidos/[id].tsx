@@ -108,13 +108,12 @@ export default function OrderDetail() {
           <View className="gap-5">
             {items.map((item, i) => (
               <View key={i} className="flex-row items-center gap-4 rounded-2xl bg-neutral-100 p-3 pr-5">
-                <Image source={IMG_ITEM} accessibilityLabel={item.nombre} contentFit="cover" style={{ width: 80, height: 80, borderRadius: 12 }} />
+                <Image source={IMG_ITEM} accessibilityLabel={item.nombre} contentFit="cover" style={{ width: 72, height: 72, borderRadius: 12 }} />
                 <View className="min-w-0 flex-1">
-                  <Texto numberOfLines={1} className="font-sans text-lg font-semibold text-neutral-900">{item.nombre}</Texto>
-                  <Texto className="text-sm font-medium text-primary-500">{item.categoria}</Texto>
-                  <Texto className="text-xs text-neutral-500">{item.cantidad}</Texto>
+                  <Texto numberOfLines={2} className="font-sans text-base font-semibold text-neutral-900">{item.nombre}</Texto>
+                  <Texto className="text-sm text-neutral-500"><Texto className="text-sm font-medium text-primary-500">{item.categoria}</Texto> · {item.cantidad}</Texto>
+                  <Texto className="mt-1 font-sans text-lg font-bold text-neutral-900">{item.precio}</Texto>
                 </View>
-                <Texto className="font-sans text-xl font-bold text-neutral-900">{item.precio}</Texto>
                 <Pressable accessibilityRole="button" accessibilityLabel={`Opciones de ${item.nombre}`} className="px-1">
                   <Texto className="text-xl leading-none text-neutral-500">⋯</Texto>
                 </Pressable>

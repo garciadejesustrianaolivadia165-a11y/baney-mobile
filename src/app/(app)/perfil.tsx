@@ -6,7 +6,7 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { imagen } from "@/lib/imagenes";
-import { cerrarSesion, useSesion } from "@/lib/sesion";
+import { cerrarSesion, SALIDA, useSesion } from "@/lib/sesion";
 
 type Opcion = { t: string; d: string; bg: string; color: string; i: string; href: Href; circulos?: [number, number, number][] };
 
@@ -90,7 +90,7 @@ export default function Perfil() {
             accessibilityRole="button"
             onPress={() => {
               cerrarSesion();
-              router.replace("/");
+              router.replace(SALIDA);
             }}
             className="flex-row items-center gap-4 px-5 py-4 active:bg-error-50"
           >

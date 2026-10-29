@@ -28,7 +28,7 @@ export default function Busca() {
             texto="Tengo camiones o equipos y quiero ofrecer mis servicios."
             onPress={() => {
               actualizarSesion({ busca: "transportista" });
-              router.push("/auth");
+              router.push("/register");
             }}
           />
           <CardOpcion
@@ -37,7 +37,7 @@ export default function Busca() {
             texto="Deseo ofrecer mis productos y abrir mi marca al mercado."
             onPress={() => {
               actualizarSesion({ busca: "productor" });
-              router.push("/auth");
+              router.push("/register");
             }}
           />
         </View>

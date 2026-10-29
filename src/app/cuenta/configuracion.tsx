@@ -8,7 +8,7 @@ import CabeceraVolver from "@/components/movil/cabecera-volver";
 import Entrada, { FilaOpcion, Interruptor, Paso } from "@/components/movil/entrada";
 import { ICONOS } from "@/components/ui/icono";
 import { SOMBRA } from "@/lib/estilos";
-import { cerrarSesion } from "@/lib/sesion";
+import { cerrarSesion, SALIDA } from "@/lib/sesion";
 
 /** Notificaciones y seguridad (lo comparten Perfil → Configuración y el menú del cliente) */
 export function ConfiguracionContenido() {
@@ -57,7 +57,7 @@ export function ConfiguracionContenido() {
           </View>
         </View>
 
-        <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => { cerrarSesion(); router.replace("/"); }} className="w-full py-3.5" textClassName="text-[15px]" sinSombra>
+        <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => { cerrarSesion(); router.replace(SALIDA); }} className="w-full py-3.5" textClassName="text-[15px]" sinSombra>
           Cerrar sesión
         </BotonPill>
     </>

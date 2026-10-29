@@ -2,7 +2,7 @@
 export type PedidoCliente = {
   id: string;
   fecha: string;
-  proveedor: { nombre: string; lugar: string; img: string };
+  proveedor: { id: string; nombre: string; lugar: string; img: string };
   items: { nombre: string; categoria: string; cantidad: string; precio: number; img: string }[];
   itbis: number;
   envio: number;

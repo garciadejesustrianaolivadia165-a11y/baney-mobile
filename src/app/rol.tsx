@@ -49,7 +49,7 @@ export default function RolScreen() {
               texto={c.texto}
               onPress={() => {
                 actualizarSesion({ rol: c.rol, busca: null });
-                router.push(c.rol === "cliente" ? "/busca" : "/auth");
+                router.push(c.rol === "cliente" ? "/busca" : "/register");
               }}
             />
           ))}

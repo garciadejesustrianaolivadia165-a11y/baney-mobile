@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, Easing, View } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 
 import Texto from "@/components/ui/texto";
@@ -11,6 +11,7 @@ import { IMAGENES } from "@/lib/imagenes";
 // Pasa sola al onboarding a los 2,5 s, como en el prototipo web.
 export default function Carga() {
   const router = useRouter();
+  const { destino } = useLocalSearchParams<{ destino?: string }>();
   const giro = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -18,12 +19,12 @@ export default function Carga() {
       Animated.timing(giro, { toValue: 1, duration: 1000, easing: Easing.linear, useNativeDriver: true }),
     );
     anim.start();
-    const t = setTimeout(() => router.replace("/onboarding"), 2500);
+    const t = setTimeout(() => router.replace(destino === "login" ? "/login" : "/onboarding"), 2500);
     return () => {
       anim.stop();
       clearTimeout(t);
     };
-  }, [giro, router]);
+  }, [giro, router, destino]);
 
   const rotate = giro.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] });
 

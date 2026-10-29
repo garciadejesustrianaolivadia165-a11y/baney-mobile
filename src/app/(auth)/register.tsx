@@ -7,18 +7,21 @@ import GoogleButton from "@/components/ui/google-button";
 import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
 import { SeparadorOr } from "./login";
+import { destinoPorRol, useSesion } from "@/lib/sesion";
 
 export default function Register() {
   const router = useRouter();
   const [form, setForm] = useState({ nombre: "", apellido: "", correo: "", cedula: "", telefono: "", contrasena: "" });
+  const { rol } = useSesion();
 
   function setField(field: keyof typeof form) {
     return (value: string) => setForm((prev) => ({ ...prev, [field]: value }));
   }
 
   function enviar() {
-    // TODO: llamar a la API real; por ahora simula el registro exitoso
-    router.replace("/login");
+    // TODO: llamar a la API real; por ahora simula el registro exitoso.
+    // En móvil (con rol elegido) entra directo; en la web vuelve al login.
+    router.replace(rol ? destinoPorRol() : "/login");
   }
 
   return (
@@ -53,8 +56,8 @@ export default function Register() {
       <SeparadorOr />
 
       <View className="flex-row justify-center gap-4">
-        <GoogleButton />
-        <GoogleButton />
+        <GoogleButton onPress={enviar} />
+        <GoogleButton onPress={enviar} />
       </View>
     </View>
   );

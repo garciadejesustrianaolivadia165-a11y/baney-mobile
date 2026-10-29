@@ -125,7 +125,7 @@ export default function FormularioPerfil({
 
       <View className="gap-4 pt-2">
         {tiene("pagos") && (
-          <BotonPill color="#afc79f" textoColor="#1e2a19" className="w-full py-3.5" textClassName="font-sans text-[15px] font-semibold" sinSombra>
+          <BotonPill color="#afc79f" textoColor="#1e2a19" href="/dashboard/pagos" className="w-full py-3.5" textClassName="font-sans text-[15px] font-semibold" sinSombra>
             Agregar otro método de pago
           </BotonPill>
         )}

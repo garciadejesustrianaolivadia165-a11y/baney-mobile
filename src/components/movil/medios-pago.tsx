@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 
 import BotonPill from "@/components/movil/boton-pill";
+import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
+import Icono, { ICONOS } from "@/components/ui/icono";
 import { BotonPago, Casilla, EntradaPago, FilaDato, LogoPayPal, MarcasTarjeta, ResumenPago } from "@/components/movil/pago";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
@@ -15,6 +17,7 @@ import { agregarMetodo, eliminarMetodo, hacerPredeterminado, useMetodosPago } fr
 export default function MediosPago({ modo, material = "Materiales", onContinuar }: { modo: "pago" | "gestion"; material?: string; onContinuar?: () => void }) {
   const guardados = useMetodosPago();
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [eligiendo, setEligiendo] = useState(false);
   const [titular, setTitular] = useState("");
   const [numero, setNumero] = useState("");
   const [vencimiento, setVencimiento] = useState("");
@@ -184,6 +187,32 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
           </Detalle>
         )}
       </View>
+
+      {modo === "gestion" && (
+        <View className="mt-2">
+          <BotonPill color="#4A5720" onPress={() => setEligiendo((e) => !e)} className="w-full py-4" sinSombra>
+            {(pressed) => (
+              <View className="flex-row items-center gap-2">
+                <Icono d={eligiendo ? ICONOS.cerrar : ICONOS.mas} size={16} color={pressed ? "#4A5720" : "#fff"} strokeWidth={2.2} />
+                <Texto className="text-[15px] font-bold" style={{ color: pressed ? "#4A5720" : "#fff" }}>Agregar nuevo método de pago</Texto>
+              </View>
+            )}
+          </BotonPill>
+          {eligiendo && (
+            <View className="mt-3 flex-row gap-3">
+              <TarjetaSeleccion activo={abierto === "nueva"} onPress={() => { setAbierto("nueva"); setEligiendo(false); }} className="flex-1 flex-row items-center justify-center gap-2 py-3.5">
+                <Icono d={ICONOS.tarjeta} size={18} color={TONO.inactivo} strokeWidth={1.8} />
+                <Texto className="text-[14px] font-semibold" style={{ color: TONO.inactivo }}>Tarjeta débito/crédito</Texto>
+              </TarjetaSeleccion>
+              {!paypal && (
+                <TarjetaSeleccion activo={abierto === "paypal"} onPress={() => { setAbierto("paypal"); setEligiendo(false); }} className="flex-1 items-center justify-center py-3.5">
+                  <LogoPayPal size={15} />
+                </TarjetaSeleccion>
+              )}
+            </View>
+          )}
+        </View>
+      )}
     </View>
   );
 }

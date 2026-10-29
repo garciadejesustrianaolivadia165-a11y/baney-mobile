@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import type { Href } from "expo-router";
 
 // Estado de sesión del prototipo (rol elegido, qué busca el cliente y los datos
 // del perfil que se editan desde Perfil → Datos personales / Mi Empresa).
@@ -65,7 +66,19 @@ export function actualizarPerfil(cambios: Partial<Perfil>) {
   emitir();
 }
 
+/** Cerrar sesión vuelve al splash y luego al login; el rol elegido se conserva para el próximo acceso. */
 export function cerrarSesion() {
-  sesion = INICIAL;
+  sesion = { ...INICIAL, rol: sesion.rol, busca: sesion.busca };
   emitir();
 }
+
+/** A dónde entra el usuario tras iniciar sesión o registrarse, según el rol elegido */
+export function destinoPorRol(): Href {
+  if (sesion.rol === "proveedor") return "/dashboard";
+  if (sesion.rol === "transportista") return "/transportista";
+  if (sesion.rol === "cliente") return sesion.busca === "productor" ? "/cliente" : "/mapa";
+  return "/rol";
+}
+
+/** Ruta de salida: splash verde y después la vista de iniciar sesión */
+export const SALIDA: Href = { pathname: "/", params: { destino: "login" } };

@@ -10,6 +10,7 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
+import { cerrarSesion, SALIDA } from "@/lib/sesion";
 
 // Mismos enlaces que la web; "Sobre Nosotros" y "Academia BANEY" siguen pendientes.
 const links: { label: string; href?: Href }[] = [
@@ -80,7 +81,7 @@ export default function Navbar({ session = false }: { session?: boolean }) {
           </View>
           <View className="mt-5 gap-3">
             {session ? (
-              <Button href="/landing" variant="outline" className="w-full py-2.5" textClassName="text-sm" onPress={() => setMenuAbierto(false)}>
+              <Button variant="outline" className="w-full py-2.5" textClassName="text-sm" onPress={() => { setMenuAbierto(false); cerrarSesion(); router.replace(SALIDA); }}>
                 Cerrar Sección
               </Button>
             ) : (

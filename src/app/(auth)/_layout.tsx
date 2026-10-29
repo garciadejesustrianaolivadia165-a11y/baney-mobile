@@ -3,7 +3,6 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View, type Layou
 import { Image } from "expo-image";
 import { Slot, useRouter } from "expo-router";
 
-import Navbar from "@/components/navbar";
 import Texto from "@/components/ui/texto";
 import { IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
@@ -47,7 +46,10 @@ export default function AuthLayout() {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      <Navbar />
+      {/* Mobile: sin la cabecera pública de la web, solo el logotipo */}
+      <View pointerEvents="none" className="absolute left-5 top-12">
+        <Image source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]} accessibilityLabel="BANEY" contentFit="contain" style={{ width: 120, height: 36 }} />
+      </View>
     </View>
   );
 }

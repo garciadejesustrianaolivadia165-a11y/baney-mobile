@@ -1,12 +1,13 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter, usePathname, type Href } from "expo-router";
+import { cerrarSesion, SALIDA } from "@/lib/sesion";
+import { PEDIDOS_CLIENTE } from "@/lib/pedidos-cliente";
 
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { PROVEEDORES_TOP } from "@/lib/pedidos-cliente";
-import BotonPill from "@/components/movil/boton-pill";
 
 export type RolPanel = "proveedor" | "cliente";
 import { SOMBRA } from "@/lib/estilos";
@@ -93,16 +94,23 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false, rol =
           <Texto className="mt-16 text-[17px] font-bold text-[#3F443D]">TUS TOP 3 PROVEEDORES</Texto>
           <View className="mt-5 gap-4">
             {PROVEEDORES_TOP.map((p) => (
-              <View key={p.id} className="flex-row items-center gap-3 px-1">
+              <Pressable
+                key={p.id}
+                accessibilityRole="link"
+                accessibilityLabel={`Ver último pedido a ${p.nombre}`}
+                onPress={() => {
+                  const ultimo = PEDIDOS_CLIENTE.find((x) => x.proveedor.id === p.id);
+                  ir(ultimo ? { pathname: "/cliente/pedido/[id]", params: { id: ultimo.id } } : "/cliente/historial");
+                }}
+                className="flex-row items-center gap-3 px-1 active:opacity-60"
+              >
                 <Image source={imagen(p.img)} accessibilityLabel={p.nombre} contentFit="cover" style={{ width: 36, height: 36, borderRadius: 18 }} />
                 <View className="min-w-0 flex-1">
                   <Texto numberOfLines={1} className="text-sm font-semibold text-[#3F443D]">{p.nombre}</Texto>
                   <Texto numberOfLines={1} className="text-xs text-neutral-500">{p.pedidos} pedidos · {p.lugar}</Texto>
                 </View>
-                <BotonPill color="#b1864e" onPress={() => ir("/cliente")} className="px-3 py-1.5" textClassName="text-[11px]" sinSombra>
-                  Pedir de nuevo
-                </BotonPill>
-              </View>
+                <Icono d={ICONOS.chevron} size={16} color="#B9C0CB" strokeWidth={1.6} />
+              </Pressable>
             ))}
           </View>
         </>
@@ -132,7 +140,7 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false, rol =
               <Texto className={`text-base font-medium ${activo(item) ? "text-primary-400" : "text-[#3F443D]"}`}>{item.label}</Texto>
             </Pressable>
           ))}
-          <Pressable accessibilityRole="link" onPress={() => ir("/landing")} className="flex-row items-center gap-3 px-1 py-2.5 active:opacity-60">
+          <Pressable accessibilityRole="link" onPress={() => { onCerrar?.(); cerrarSesion(); router.replace(SALIDA); }} className="flex-row items-center gap-3 px-1 py-2.5 active:opacity-60">
             <Icono d={ICONOS.salir} size={20} color="#ef4444" />
             <Texto className="text-[15px] font-medium text-error-500">Cerrar Sección</Texto>
           </Pressable>

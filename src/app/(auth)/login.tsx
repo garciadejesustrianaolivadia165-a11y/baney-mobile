@@ -6,6 +6,7 @@ import Button from "@/components/ui/button";
 import GoogleButton from "@/components/ui/google-button";
 import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
+import { destinoPorRol, useSesion } from "@/lib/sesion";
 
 type LoginErrors = { nombre?: string; correo?: string; contrasena?: string };
 
@@ -26,6 +27,8 @@ export default function Login() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
+  const { rol } = useSesion();
+  const entrar = () => router.replace(rol ? destinoPorRol() : "/home");
 
   function enviar() {
     // Vista "Error de Acceso": los mensajes aparecen bajo cada campo inválido
@@ -37,7 +40,7 @@ export default function Login() {
 
     if (Object.keys(next).length === 0) {
       // TODO: llamar a la API real; por ahora simula el acceso exitoso
-      router.replace("/home");
+      entrar();
     }
   }
 
@@ -63,8 +66,8 @@ export default function Login() {
       <SeparadorOr />
 
       <View className="flex-row justify-center gap-4">
-        <GoogleButton />
-        <GoogleButton />
+        <GoogleButton onPress={entrar} />
+        <GoogleButton onPress={entrar} />
       </View>
     </View>
   );
