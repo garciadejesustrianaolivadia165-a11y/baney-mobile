@@ -5,6 +5,7 @@ import { Image } from "expo-image";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
+import type { FuenteImagen } from "@/lib/imagenes";
 
 // Tarjeta de camión/cliente cercano del panel bajo el mapa
 export default function TarjetaCercano({
@@ -17,7 +18,7 @@ export default function TarjetaCercano({
   tono = "ok",
   onPress,
 }: {
-  img?: number;
+  img?: FuenteImagen;
   titulo: string;
   detalle: string;
   conPin?: boolean;

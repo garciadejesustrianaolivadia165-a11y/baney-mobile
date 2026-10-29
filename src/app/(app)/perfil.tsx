@@ -1,23 +1,38 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
-import { IMAGENES } from "@/lib/imagenes";
-import { cerrarSesion } from "@/lib/sesion";
+import { imagen } from "@/lib/imagenes";
+import { cerrarSesion, useSesion } from "@/lib/sesion";
 
-const OPCIONES = [
-  { t: "Datos personales", d: "Nombre, correo, teléfono", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.perfil },
-  { t: "Métodos de pago", d: "Tarjetas y facturación", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.tarjeta },
-  { t: "Mi Empresa", d: "RNC y registro fiscal", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.empresa },
-  { t: "Configuración", d: "Notificaciones y seguridad", bg: "bg-[#F1F3F0]", color: "#6B7688", i: ICONOS.ajustes, circulos: [[12, 12, 3]] as [number, number, number][] },
-];
+type Opcion = { t: string; d: string; bg: string; color: string; i: string; href: Href; circulos?: [number, number, number][] };
 
 // ============ VISTA 14: PERFIL (cliente y transportista) ============
+// Cada opción abre su pantalla bajo src/app/cuenta/ (datos, pagos, empresa, configuración).
 export default function Perfil() {
   const router = useRouter();
+  const { rol, perfil } = useSesion();
+  const transportista = rol === "transportista";
+
+  const opciones: Opcion[] = [
+    { t: "Datos personales", d: "Nombre, correo, teléfono", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.perfil, href: "/cuenta/datos" },
+    { t: "Métodos de pago", d: "Tarjetas y facturación", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.tarjeta, href: "/cuenta/pagos" },
+    {
+      t: "Mi Empresa",
+      d: transportista ? "Empresa, vehículos y licencia" : "RNC y registro fiscal",
+      bg: "bg-[#F7F3E9]",
+      color: "#6B6237",
+      i: transportista ? ICONOS.camion : ICONOS.empresa,
+      href: "/cuenta/empresa",
+    },
+    { t: "Configuración", d: "Notificaciones y seguridad", bg: "bg-[#F1F3F0]", color: "#6B7688", i: ICONOS.ajustes, circulos: [[12, 12, 3]], href: "/cuenta/configuracion" },
+  ];
+
+  const nombre = `${perfil.nombres} ${perfil.apellidos}`;
+  const subtitulo = perfil.empresa.nombre || (transportista ? "Transportista independiente" : perfil.provincia);
 
   return (
     <ScrollView className="flex-1 bg-[#F6F7F4]" showsVerticalScrollIndicator={false}>
@@ -28,16 +43,12 @@ export default function Perfil() {
 
         <View className="self-center">
           <View style={SOMBRA.alta} className="rounded-full">
-            <Image
-              source={IMAGENES["/images/image_home/image_home_11.png"]}
-              accessibilityLabel="Triana Olivadia García"
-              contentFit="cover"
-              style={{ width: 124, height: 124, borderRadius: 62, borderWidth: 4, borderColor: "#fff" }}
-            />
+            <Image source={imagen(perfil.avatar)} accessibilityLabel={nombre} contentFit="cover" style={{ width: 124, height: 124, borderRadius: 62, borderWidth: 4, borderColor: "#fff" }} />
           </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Editar foto"
+            onPress={() => router.push("/cuenta/datos")}
             style={SOMBRA.boton}
             className="absolute bottom-0 right-0 h-10 w-10 items-center justify-center rounded-full bg-[#C4B291] active:bg-transparent active:border-2 active:border-[#C4B291]"
           >
@@ -45,16 +56,16 @@ export default function Perfil() {
           </Pressable>
         </View>
 
-        <Texto className="mt-5 text-center text-[24px] font-bold text-white">Triana Olivadia García</Texto>
-        <Texto className="mt-1 text-center text-[15px] text-white/80">Constructora García & Asoc.</Texto>
+        <Texto className="mt-5 text-center text-[24px] font-bold text-white">{nombre}</Texto>
+        <Texto className="mt-1 text-center text-[15px] text-white/80">{subtitulo}</Texto>
 
         <View className="mt-4 flex-row justify-center gap-3">
           <View className="rounded-full bg-white/20 px-4 py-2">
-            <Texto className="text-[13px] font-semibold text-white">Cliente Premium</Texto>
+            <Texto className="text-[13px] font-semibold text-white">{transportista ? "Transportista verificado" : "Cliente Premium"}</Texto>
           </View>
           <View className="flex-row items-center gap-1.5 rounded-full bg-[#C4B291] px-4 py-2">
             <Icono d={ICONOS.estrella} size={14} color="#3F3A28" relleno />
-            <Texto className="text-[13px] font-bold text-[#3F3A28]">5.0</Texto>
+            <Texto className="text-[13px] font-bold text-[#3F3A28]">{transportista ? "4.98" : "5.0"}</Texto>
           </View>
         </View>
       </View>
@@ -62,8 +73,8 @@ export default function Perfil() {
       {/* Tarjeta de opciones, por encima del verde */}
       <View className="z-20 -mt-8 px-6 pb-6">
         <View style={SOMBRA.alta} className="overflow-hidden rounded-[24px] bg-white">
-          {OPCIONES.map((o) => (
-            <Pressable key={o.t} accessibilityRole="button" className="flex-row items-center gap-4 border-b border-[#EFF1ED] px-5 py-4 active:bg-primary-400/10">
+          {opciones.map((o) => (
+            <Pressable key={o.t} accessibilityRole="link" onPress={() => router.push(o.href)} className="flex-row items-center gap-4 border-b border-[#EFF1ED] px-5 py-4 active:bg-primary-400/10">
               <View className={`h-11 w-11 items-center justify-center rounded-xl ${o.bg}`}>
                 <Icono d={o.i} circulos={o.circulos} size={22} color={o.color} strokeWidth={1.7} />
               </View>

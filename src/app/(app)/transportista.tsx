@@ -8,7 +8,8 @@ import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
-import { IMAGENES } from "@/lib/imagenes";
+import { imagen, IMAGENES } from "@/lib/imagenes";
+import { VIAJES } from "@/lib/viajes";
 
 // ============ VISTA 12: DASHBOARD TRANSPORTISTA ============
 export default function DashboardTransportista() {
@@ -98,21 +99,30 @@ export default function DashboardTransportista() {
         <View className="mt-7 flex-row items-center justify-between">
           <Texto className="text-[12px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">Solicitudes cercanas</Texto>
           <View className="rounded-full bg-[#4A5720] px-3 py-1">
-            <Texto className="text-[11px] font-bold text-white">2 Nuevos</Texto>
+            <Texto className="text-[11px] font-bold text-white">{VIAJES.length} Nuevos</Texto>
           </View>
         </View>
 
-        {[0, 1].map((i) => (
-          <View key={i} style={SOMBRA.card} className="mt-4 rounded-2xl border border-[#EDEFEB] bg-white p-4">
+        {VIAJES.map((v) => (
+          <Pressable key={v.id} accessibilityRole="button" accessibilityLabel={`Ver solicitud de ${v.cliente}`} onPress={() => router.push({ pathname: "/viaje/[id]", params: { id: v.id } })} style={SOMBRA.card} className="mt-4 rounded-2xl border border-[#EDEFEB] bg-white p-4 active:bg-neutral-50">
             <View className="flex-row items-center gap-3">
-              <Image source={IMAGENES["/images/image_home/image_home_10.png"]} accessibilityLabel="Ing. Ricardo P." contentFit="cover" style={{ width: 44, height: 44, borderRadius: 22 }} />
+              <Image source={imagen(v.img)} accessibilityLabel={v.cliente} contentFit="cover" style={{ width: 44, height: 44, borderRadius: 22 }} />
               <View className="min-w-0 flex-1">
-                <Texto className="text-[15px] font-bold leading-tight text-[#16202E]">Ing. Ricardo P.</Texto>
-                <Texto className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#9AA3AF]">Higüey • Hace 2 min</Texto>
+                <Texto className="text-[15px] font-bold leading-tight text-[#16202E]">{v.cliente}</Texto>
+                <Texto className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#9AA3AF]">{v.origen.split(",")[0]} • {v.publicado}</Texto>
               </View>
-              <Texto className="text-[16px] font-bold text-[#4A5720]">RD$ 3,800</Texto>
+              <Texto className="text-[16px] font-bold text-[#4A5720]">RD$ {v.precio.toLocaleString("en-US")}</Texto>
             </View>
-            <Texto className="mt-3 text-[13px] text-[#6B7688]">Transporte de 10m³ de Grava hacia Verón.</Texto>
+            <Texto className="mt-3 text-[13px] text-[#6B7688]">Transporte de {v.detalle} hacia {v.destino.split(",")[0]}.</Texto>
+            {v.condiciones.filter((c) => c !== "Ninguna").length > 0 && (
+              <View className="mt-2 flex-row flex-wrap gap-2">
+                {v.condiciones.map((c) => (
+                  <View key={c} className="rounded-md bg-secondary4-50 px-2 py-1">
+                    <Texto className="text-[11px] font-semibold text-[#3F4A20]">{c}</Texto>
+                  </View>
+                ))}
+              </View>
+            )}
             <View className="mt-4 flex-row gap-3">
               <BotonPill color={C.oliva} onPress={() => router.navigate("/transportista-mapa")} className="flex-1 py-3" textClassName="text-[15px]" sinSombra>
                 Aceptar
@@ -125,7 +135,7 @@ export default function DashboardTransportista() {
                 {({ pressed }) => <Icono d={ICONOS.cerrar} size={16} color={pressed ? "#fff" : "#8A93A2"} strokeWidth={2} />}
               </Pressable>
             </View>
-          </View>
+          </Pressable>
         ))}
       </ScrollView>
     </SafeAreaView>

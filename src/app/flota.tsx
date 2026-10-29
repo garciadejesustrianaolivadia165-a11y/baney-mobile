@@ -11,11 +11,8 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C } from "@/lib/estilos";
 import { IMAGENES } from "@/lib/imagenes";
+import { descripcionCamion, useFlota } from "@/lib/flota";
 
-const CAMIONES = [
-  { n: "Mack #23", d: "Volteo 12m³" },
-  { n: "Isuzu #04", d: "Cama 20ft" },
-];
 const RUTA = [
   { label: "Origen (Punto de descarga actual)", valor: "La Romana, Rep. Dom.", icono: IMAGENES["/images/image_rutas/from_icon.png"] },
   { label: "Destino Final (Donde quieres volver)", valor: "Santo Domingo", icono: IMAGENES["/images/image_rutas/where_icon.png"] },
@@ -32,7 +29,8 @@ function Paso({ children }: { children: string }) {
 // ============ VISTA 13: PUBLICAR DISPONIBILIDAD ============
 export default function Flota() {
   const router = useRouter();
-  const [camion, setCamion] = useState("Mack #23");
+  const flota = useFlota();
+  const [camion, setCamion] = useState(flota[0]?.alias ?? "");
   const [horario, setHorario] = useState("Ahora mismo");
   const [precio, setPrecio] = useState("");
   const [enfocado, setEnfocado] = useState(false);
@@ -47,19 +45,20 @@ export default function Flota() {
         <View>
           <Paso>1. Seleccionar camión</Paso>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="mt-4 gap-4">
-            {CAMIONES.map((c) => {
-              const activo = camion === c.n;
+            {flota.map((c) => {
+              const activo = camion === c.alias;
               return (
-                <TarjetaSeleccion key={c.n} activo={activo} onPress={() => setCamion(c.n)} className="h-[122px] w-[152px] items-center justify-center gap-1.5">
+                <TarjetaSeleccion key={c.id} activo={activo} onPress={() => setCamion(c.alias)} className="h-[122px] w-[152px] items-center justify-center gap-1.5">
                   <Icono d={ICONOS.camion} size={28} color={activo ? TONO.activo : "#B9C0CB"} strokeWidth={1.7} />
-                  <Texto className="text-[16px] font-bold text-[#16202E]">{c.n}</Texto>
-                  <Texto className={`text-[13px] ${activo ? "text-[#7C8757]" : "text-[#8A93A2]"}`}>{c.d}</Texto>
+                  <Texto className="text-[16px] font-bold text-[#16202E]">{c.alias}</Texto>
+                  <Texto className={`text-[13px] ${activo ? "text-[#7C8757]" : "text-[#8A93A2]"}`}>{descripcionCamion(c)}</Texto>
                 </TarjetaSeleccion>
               );
             })}
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Agregar camión"
+              onPress={() => router.push("/camion/nuevo")}
               className="h-[122px] w-[152px] items-center justify-center rounded-2xl border-2 border-dashed border-[#D8DCD5] active:border-secondary4-400"
             >
               {({ pressed }) => <Icono d={ICONOS.mas} size={28} color={pressed ? "#747d24" : "#C9CFC6"} />}
