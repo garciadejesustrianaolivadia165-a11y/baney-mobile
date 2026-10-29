@@ -30,7 +30,7 @@ npx eas-cli@latest build -p android --profile preview
 4. Cuando aparezca el QR, en Expo Go toca **Scan QR** (o copia la URL `exp://...` de la terminal y usa **Enter URL**).
 5. Cada cambio guardado en el Codespace se recarga solo en el teléfono.
 
-El túnel hace falta porque el teléfono y el Codespace no están en la misma red. El paquete `@expo/ngrok` ya está en las devDependencies para que no pida instalarlo.
+El script usa `--tunnel ngrok` porque el túnel firmado por defecto del SDK 58 exige iniciar sesión en Expo. El túnel hace falta porque el teléfono y el Codespace no están en la misma red. El paquete `@expo/ngrok` ya está en las devDependencies para que no pida instalarlo.
 
 ## Estructura
 
