@@ -84,8 +84,8 @@ export function TarjetaTotal({
 export function Leyenda({ items, className = "mt-3" }: { items: { nombre: string; color: string }[]; className?: string }) {
   return (
     <View className={`flex-row flex-wrap gap-5 ${className}`}>
-      {items.map((l) => (
-        <View key={l.nombre} className="flex-row items-center gap-1.5">
+      {items.map((l, i) => (
+        <View key={`${l.nombre}-${i}`} className="flex-row items-center gap-1.5">
           <View className="h-2 w-2 rounded-full" style={{ backgroundColor: l.color }} />
           <Texto className="text-xs text-neutral-600">{l.nombre}</Texto>
         </View>

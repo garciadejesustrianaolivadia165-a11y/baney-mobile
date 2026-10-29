@@ -21,8 +21,8 @@ const barrasVentas = [55, 40, 70, 48, 30, 60, 75, 42, 52, 38, 65, 45, 58, 35, 68
 // Puntos de las líneas Jan-Jun (3 series, valores 0-100)
 const series = [
   { nombre: "Content", color: "#9eaa31", puntos: [30, 45, 50, 62, 70, 66] },
-  { nombre: "Content ", color: "#e0b84a", puntos: [20, 30, 42, 50, 58, 64] },
-  { nombre: "Content  ", color: "#6b4926", puntos: [40, 48, 55, 60, 68, 75] },
+  { nombre: "Content 2", color: "#e0b84a", puntos: [20, 30, 42, 50, 58, 64] },
+  { nombre: "Content 3", color: "#6b4926", puntos: [40, 48, 55, 60, 68, 75] },
 ];
 const meses = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jun"];
 const DONA = [
