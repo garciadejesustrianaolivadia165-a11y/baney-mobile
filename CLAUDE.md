@@ -4,7 +4,7 @@ Guía para Claude Code en este repositorio.
 
 ## Proyecto
 
-BANEY_RD (marca "BANEY"; el diseño Figma usa el nombre antiguo "CANEY" — en el código y la UI siempre se escribe BANEY) — **app móvil** del marketplace agropecuario y de logística de República Dominicana. Es la migración a React Native del frontend web `garciadejesustrianaolivadia165-a11y/Fronted_CANEY-RD` (React Router v8 + Tailwind v4), que sigue siendo la referencia funcional y visual junto con el Figma: https://www.figma.com/design/WPvFMZrfTAAe81yXKnWdLu/UI-UX-CANEY-RD
+BANEY_RD (marca "BANEY"; el diseño Figma usa el nombre antiguo "CANEY" — en el código y la UI siempre se escribe BANEY) — **app móvil** del marketplace agropecuario y de logística de República Dominicana. Repo oficial: `caneyRD/baney-frontend-mobile` (fork de trabajo: `garciadejesustrianaolivadia165-a11y/baney-mobile`). Es la migración a React Native del frontend web `garciadejesustrianaolivadia165-a11y/Fronted_CANEY-RD` (React Router v8 + Tailwind v4), que sigue siendo la referencia funcional y visual junto con el Figma: https://www.figma.com/design/WPvFMZrfTAAe81yXKnWdLu/UI-UX-CANEY-RD
 
 Stack: **Expo SDK 58**, React Native 0.88, React 19, TypeScript, **Expo Router** (rutas por archivo en `src/app/`), **NativeWind v4** (Tailwind 3.4, `className` en componentes nativos), `expo-image`, `react-native-svg`, `react-native-reanimated`. Un solo código para Android, iOS y web. Toda la UI y sus textos van en español con tildes correctas; el código mezcla inglés en rutas/archivos y español en variables locales.
 

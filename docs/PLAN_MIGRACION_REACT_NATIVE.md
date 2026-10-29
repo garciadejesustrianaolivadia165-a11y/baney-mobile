@@ -1,7 +1,7 @@
 # Plan de migración BANEY RD: React (web) → React Native
 
 Fuente actual: `garciadejesustrianaolivadia165-a11y/Fronted_CANEY-RD` (React Router v8 SSR, React 19, TS, Tailwind v4, 54 archivos .tsx, ~11.300 líneas).
-Repo oficial: `caneyRD/baney-frontend` (hoy solo tiene un README).
+Repo oficial: `caneyRD/baney-frontend-mobile`.
 
 ## Stack destino (recomendado)
 
@@ -59,7 +59,7 @@ Cuando el repo nuevo esté estable: `git remote add official https://github.com/
 - ✅ Fase 2: primitivas UI (`ui/`) y componentes del prototipo (`movil/`).
 - ✅ Fase 3: todas las pantallas (prototipo móvil, auth, home, landing, marketplace, ficha, checkout, dashboard completo).
 - ✅ Fase 4: verificado en Expo Go (Android) y con el build web en Chromium.
-- ⏳ Fase 5: subir al repo oficial de caneyRD (pendiente de decidir destino).
+- ✅ Fase 5: código subido al repo oficial `caneyRD/baney-frontend-mobile` (el fork de trabajo `garciadejesustrianaolivadia165-a11y/baney-mobile` se mantiene sincronizado).
 - ⏳ Siguiente: conectar la API real sustituyendo los datos de `src/lib`; revisar cada pantalla en el teléfono contra el Figma.
 
 ## Riesgos / decisiones
