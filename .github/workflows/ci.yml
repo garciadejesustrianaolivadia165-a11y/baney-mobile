@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build web (genera rutas tipadas y verifica que Metro + NativeWind compilan)
+        run: npx expo export -p web
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Expo doctor
+        run: npx expo-doctor
