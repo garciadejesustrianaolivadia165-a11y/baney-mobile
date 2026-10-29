@@ -53,6 +53,15 @@ Patrón por archivo: `div`→`View`, texto→`Text` (obligatorio), `img`→`Imag
 ### Fase 5 · Subir al repo oficial
 Cuando el repo nuevo esté estable: `git remote add official https://github.com/caneyRD/<repo>.git && git push official main`. Decidir antes si va a `caneyRD/baney-frontend` (hoy vacío) o a un `caneyRD/baney-mobile` nuevo.
 
+## Estado (29/10/2026)
+
+- ✅ Fase 0-1: repo `baney-mobile`, scaffold, paleta, fuentes, assets, datos, primitivas, CI, Codespaces.
+- ✅ Fase 2: primitivas UI (`ui/`) y componentes del prototipo (`movil/`).
+- ✅ Fase 3: todas las pantallas (prototipo móvil, auth, home, landing, marketplace, ficha, checkout, dashboard completo).
+- ✅ Fase 4: verificado en Expo Go (Android) y con el build web en Chromium.
+- ⏳ Fase 5: subir al repo oficial de caneyRD (pendiente de decidir destino).
+- ⏳ Siguiente: conectar la API real sustituyendo los datos de `src/lib`; revisar cada pantalla en el teléfono contra el Figma.
+
 ## Riesgos / decisiones
 - `hover:scale-105` y sombras CSS no existen igual en nativo: se traducen a `pressed` + `elevation`/`shadow*`.
 - SSR desaparece (no aplica en apps); el `typecheck` pasa a ser `tsc --noEmit` + `expo-doctor`.

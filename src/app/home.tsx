@@ -82,7 +82,7 @@ export default function Home() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Fondo decorativo superior (bg-top, 100% de ancho) */}
         {ancho > 0 && (
-          <Image pointerEvents="none" source={IMAGENES["/images/image_home/fondo_home.png"]} contentFit="cover" contentPosition="top" style={{ position: "absolute", top: 0, left: 0, width: ancho, height: ancho * 1.2 }} />
+          <Image pointerEvents="none" source={IMAGENES["/images/image_home/fondo_home.png"]} contentFit="cover" contentPosition="top" style={{ position: "absolute", top: 0, left: 0, width: ancho, height: (ancho * 3713) / 1440 }} />
         )}
 
         <View className="pt-28">
@@ -133,7 +133,7 @@ export default function Home() {
               source={IMAGENES["/images/image_home/titulo_home.png"]}
               accessibilityLabel="Mas de 35,000 mil proveedores usan nuestros servicios"
               contentFit="contain"
-              style={{ width: "100%", aspectRatio: 4, marginHorizontal: "auto" }}
+              style={{ width: "100%", aspectRatio: 1249 / 47 }}
             />
             <View className="mt-8">
               <TestimonialCarousel items={testimonios} />

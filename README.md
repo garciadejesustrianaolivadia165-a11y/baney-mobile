@@ -34,8 +34,8 @@ El script usa `--tunnel ngrok` porque el túnel firmado por defecto del SDK 58 e
 
 ## Estructura
 
-- `src/app/` — pantallas (Expo Router, rutas por archivo; `_layout.tsx` define navegadores)
-- `src/components/` — componentes reutilizables; `ui/` primitivas (button, input, google-button)
+- `src/app/` — pantallas (Expo Router, rutas por archivo; `_layout.tsx` define navegadores): splash y prototipo móvil en la raíz y `(app)/`, auth en `(auth)/`, `home`, `landing`, `marketplace/`, `checkout/` y `dashboard/`
+- `src/components/` — componentes reutilizables: `ui/` primitivas, `movil/` prototipo, `dashboard/` (sidebar, gráficos, tablas, formularios), navbar, footer, carruseles, mapa
 - `src/lib/` — datos de ejemplo, fuentes y registro de imágenes (`imagenes.ts`, generado)
 - `src/types/` — interfaces compartidas con la web (`Product`)
 - `assets/` — mismos archivos que `public/` en la web (`images/`, `icons/`, `logos/`)

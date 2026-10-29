@@ -67,8 +67,12 @@ export const IMAGENES = {
 
 export type RutaImagen = keyof typeof IMAGENES;
 
+/** Fuente aceptada por expo-image: asset empaquetado (number) o URI (foto subida, http, data:) */
+export type FuenteImagen = number | { uri: string };
+
 /** Devuelve el source nativo de una ruta web del design system (p. ej. "/logos/Baney_logo_png.png"). */
-export function imagen(ruta: string): number {
+export function imagen(ruta: string): FuenteImagen {
+  if (/^(https?:|file:|data:|content:|blob:|ph:)/.test(ruta)) return { uri: ruta };
   const src = (IMAGENES as Record<string, number>)[ruta];
   if (!src && __DEV__) console.warn(`[imagenes] ruta no registrada: ${ruta}`);
   return src ?? IMAGENES["/logos/Baney_logo_png.png"];

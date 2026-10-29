@@ -1,4 +1,5 @@
 import type { StyleProp, ViewStyle } from "react-native";
+import { useRouter, type Href } from "expo-router";
 import Presionable from "@/components/ui/presionable";
 import type { ReactNode } from "react";
 
@@ -12,6 +13,8 @@ type Props = {
   variante?: "lleno" | "borde";
   textoColor?: string;
   onPress?: () => void;
+  /** Si se pasa, al pulsar navega a esa ruta */
+  href?: Href;
   disabled?: boolean;
   className?: string;
   textClassName?: string;
@@ -27,12 +30,14 @@ export default function BotonPill({
   variante = "lleno",
   textoColor = "#ffffff",
   onPress,
+  href,
   disabled,
   className = "",
   textClassName = "",
   style,
   sinSombra,
 }: Props) {
+  const router = useRouter();
   function colores(pressed: boolean) {
     if (disabled) return { fondo: "#D9DED2", borde: "#D9DED2", texto: "#8A93A2" };
     if (variante === "lleno") {
@@ -49,7 +54,10 @@ export default function BotonPill({
     <Presionable
       accessibilityRole="button"
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => {
+        onPress?.();
+        if (href) router.push(href);
+      }}
       estilo={(pressed) => {
         const c = colores(pressed);
         return [
