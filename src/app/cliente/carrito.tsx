@@ -1,17 +1,15 @@
 import { useEffect } from "react";
 import { Pressable, View } from "react-native";
-import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import PasosCheckout from "@/components/checkout/pasos-checkout";
 import ResumenCompra from "@/components/checkout/resumen-compra";
 import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
+import ItemProducto from "@/components/item-producto";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { agregarAlCarrito, cambiarCantidad, COSTO_ENVIO, ITBIS, plural, quitarDelCarrito, subtotalCarrito, useCarrito } from "@/lib/carrito";
-import { SOMBRA } from "@/lib/estilos";
-import { imagen } from "@/lib/imagenes";
 import { pesos } from "@/lib/pedidos-cliente";
 import { CATALOGO } from "@/lib/productos";
 
@@ -59,32 +57,34 @@ export default function Carrito() {
 
       <View className="gap-4">
         {items.map((i) => (
-          <View key={i.producto.id} style={SOMBRA.card} className="rounded-[1.5rem] bg-white p-3 pr-4">
-            <View className="flex-row items-center gap-3.5">
-              <Image source={imagen(i.producto.image)} accessibilityLabel={i.producto.name} contentFit="cover" style={{ width: 76, height: 76, borderRadius: 14 }} />
-              <View className="min-w-0 flex-1">
-                <Texto numberOfLines={2} className="font-sans text-[15px] font-semibold text-neutral-900">{i.producto.name}</Texto>
-                <Texto numberOfLines={1} className="text-[12px] text-neutral-500">{i.producto.seller.name} · {i.producto.seller.location}</Texto>
-                <Texto className="mt-1 font-sans text-[16px] font-bold text-neutral-900">{pesos(i.producto.price * i.cantidad)}</Texto>
-                <Texto className="text-[11px] text-neutral-400">{pesos(i.producto.price)} por {i.unidad}</Texto>
-              </View>
+          <ItemProducto
+            key={i.producto.id}
+            img={i.producto.image}
+            nombre={i.producto.name}
+            categoria={i.categoria ?? i.producto.seller.location}
+            detalle={plural(i.cantidad, i.unidad)}
+            precio={pesos(i.producto.price * i.cantidad)}
+            precioDetalle={`${pesos(i.producto.price)} por ${i.unidad}`}
+            derecha={
               <Pressable accessibilityRole="button" accessibilityLabel={`Quitar ${i.producto.name}`} onPress={() => quitarDelCarrito(i.producto.id)} hitSlop={8} className="h-9 w-9 items-center justify-center rounded-full border border-error-200 active:bg-error-500">
                 {({ pressed }) => <Icono d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13" size={16} color={pressed ? "#fff" : "#ef4444"} />}
               </Pressable>
-            </View>
-            <View className="mt-3 flex-row items-center justify-between">
-              <Texto className="text-[12px] text-neutral-500">{plural(i.cantidad, i.unidad)}</Texto>
-              <View className="flex-row items-center gap-3 rounded-full bg-neutral-100 px-2 py-1">
-                <Pressable accessibilityRole="button" accessibilityLabel={`Una ${i.unidad} menos de ${i.producto.name}`} onPress={() => cambiarCantidad(i.producto.id, i.cantidad - 1)} className="h-8 w-8 items-center justify-center rounded-full bg-white active:bg-[#4A5720]">
-                  {({ pressed }) => <Icono d="M5 12h14" size={14} color={pressed ? "#fff" : "#3F443D"} strokeWidth={2.4} />}
-                </Pressable>
-                <Texto className="min-w-6 text-center text-[15px] font-bold text-neutral-900">{i.cantidad}</Texto>
-                <Pressable accessibilityRole="button" accessibilityLabel={`Una ${i.unidad} más de ${i.producto.name}`} onPress={() => cambiarCantidad(i.producto.id, i.cantidad + 1)} className="h-8 w-8 items-center justify-center rounded-full bg-white active:bg-[#4A5720]">
-                  {({ pressed }) => <Icono d={ICONOS.mas} size={14} color={pressed ? "#fff" : "#3F443D"} strokeWidth={2.4} />}
-                </Pressable>
+            }
+            abajo={
+              <View className="flex-row items-center justify-between">
+                <Texto numberOfLines={1} className="flex-1 text-[12px] text-neutral-500">{i.producto.seller.name}</Texto>
+                <View className="flex-row items-center gap-3 rounded-full bg-white px-2 py-1">
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Una ${i.unidad} menos de ${i.producto.name}`} onPress={() => cambiarCantidad(i.producto.id, i.cantidad - 1)} className="h-8 w-8 items-center justify-center rounded-full bg-neutral-100 active:bg-[#4A5720]">
+                    {({ pressed }) => <Icono d="M5 12h14" size={14} color={pressed ? "#fff" : "#3F443D"} strokeWidth={2.4} />}
+                  </Pressable>
+                  <Texto className="min-w-6 text-center text-[15px] font-bold text-neutral-900">{i.cantidad}</Texto>
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Una ${i.unidad} más de ${i.producto.name}`} onPress={() => cambiarCantidad(i.producto.id, i.cantidad + 1)} className="h-8 w-8 items-center justify-center rounded-full bg-neutral-100 active:bg-[#4A5720]">
+                    {({ pressed }) => <Icono d={ICONOS.mas} size={14} color={pressed ? "#fff" : "#3F443D"} strokeWidth={2.4} />}
+                  </Pressable>
+                </View>
               </View>
-            </View>
-          </View>
+            }
+          />
         ))}
       </View>
 

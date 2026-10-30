@@ -1,15 +1,14 @@
 import { View } from "react-native";
-import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import PasosCheckout from "@/components/checkout/pasos-checkout";
 import ResumenCompra from "@/components/checkout/resumen-compra";
 import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
+import ItemProducto from "@/components/item-producto";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
-import { imagen } from "@/lib/imagenes";
 import { buscarPedidoCliente, pesos, subtotalPedido, usePedidosCliente } from "@/lib/pedidos-cliente";
 
 // 06 · Confirmación: pedido creado, resumen y accesos al detalle o al marketplace.
@@ -51,14 +50,7 @@ export default function Confirmacion() {
       <View style={SOMBRA.card} className="rounded-[1.5rem] bg-white p-5">
         <View className="gap-3">
           {pedido.items.map((i, n) => (
-            <View key={n} className="flex-row items-center gap-3">
-              <Image source={imagen(i.img)} accessibilityLabel={i.nombre} contentFit="cover" style={{ width: 52, height: 52, borderRadius: 12 }} />
-              <View className="min-w-0 flex-1">
-                <Texto numberOfLines={1} className="font-sans text-[14px] font-semibold text-neutral-900">{i.nombre}</Texto>
-                <Texto className="text-[12px] text-neutral-500">{i.cantidad}</Texto>
-              </View>
-              <Texto className="text-[14px] font-bold text-neutral-900">{pesos(i.precio)}</Texto>
-            </View>
+            <ItemProducto key={n} img={i.img} nombre={i.nombre} categoria={i.categoria} detalle={i.cantidad} precio={pesos(i.precio)} />
           ))}
         </View>
         <View className="mt-4 gap-2.5 border-t border-neutral-200 pt-4">

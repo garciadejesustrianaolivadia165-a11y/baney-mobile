@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
 import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
+import ItemProducto from "@/components/item-producto";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
@@ -82,14 +83,7 @@ export default function PedidoCliente() {
         <View className="mt-8 gap-10 px-4">
           <View className="gap-5">
             {pedido.items.map((item, i) => (
-              <View key={i} className="flex-row items-center gap-4 rounded-2xl bg-neutral-100 p-3 pr-5">
-                <Image source={imagen(item.img)} accessibilityLabel={item.nombre} contentFit="cover" style={{ width: 72, height: 72, borderRadius: 12 }} />
-                <View className="min-w-0 flex-1">
-                  <Texto numberOfLines={2} className="font-sans text-base font-semibold text-neutral-900">{item.nombre}</Texto>
-                  <Texto className="text-sm text-neutral-500"><Texto className="text-sm font-medium text-primary-500">{item.categoria}</Texto> · {item.cantidad}</Texto>
-                  <Texto className="mt-1 font-sans text-lg font-bold text-neutral-900">{pesos(item.precio)}</Texto>
-                </View>
-              </View>
+              <ItemProducto key={i} img={item.img} nombre={item.nombre} categoria={item.categoria} detalle={item.cantidad} precio={pesos(item.precio)} />
             ))}
           </View>
 

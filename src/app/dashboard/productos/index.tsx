@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 
 import { Desplegable } from "@/components/dashboard/campo";
 import { TarjetaTotal } from "@/components/dashboard/graficos";
+import ItemProducto from "@/components/item-producto";
 import Pagina from "@/components/dashboard/pagina";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
@@ -114,30 +115,28 @@ export default function MisProductos() {
       ) : (
         <View className="gap-4">
           {visibles.map((p) => (
-            <View key={p.id} style={SOMBRA.card} className="rounded-[1.5rem] bg-white p-4">
-              <Pressable accessibilityRole="link" accessibilityLabel={`Editar ${p.nombre}`} onPress={() => irStock(p.id)} className="flex-row items-start gap-4">
-                <Image source={imagen(p.img)} accessibilityLabel={p.nombre} contentFit="cover" style={{ width: 64, height: 64, borderRadius: 16 }} />
-                <View className="min-w-0 flex-1">
-                  <View className="flex-row items-start justify-between gap-3">
-                    <Texto className="flex-1 text-[15px] font-bold text-[#3F443D]">{p.nombre}</Texto>
-                    <ChipEstado estado={p.estado} />
-                  </View>
-                  <Texto numberOfLines={2} className="mt-1 text-xs text-neutral-500">{p.descripcion}</Texto>
-                  <Texto className="mt-2 text-xs text-neutral-500">{p.categoria} · {p.stock} {p.unidad}</Texto>
-                  <Texto className="mt-1 text-base font-bold text-primary-600">
-                    RD$ {p.precio.toLocaleString("es-DO")}<Texto className="text-xs font-normal text-neutral-500"> / {p.unidad}</Texto>
-                  </Texto>
+            <ItemProducto
+              key={p.id}
+              img={p.img}
+              nombre={p.nombre}
+              descripcion={p.descripcion}
+              categoria={p.categoria}
+              detalle={`${p.stock} ${p.unidad}`}
+              precio={`RD$ ${p.precio.toLocaleString("es-DO")}`}
+              precioDetalle={`por ${p.unidad}`}
+              onPress={() => irStock(p.id)}
+              derecha={<ChipEstado estado={p.estado} />}
+              abajo={
+                <View className="flex-row gap-3">
+                  <BotonPill color="#486440" variante="borde" textoColor="#364a2d" onPress={() => irStock(p.id)} className="flex-1 py-2" textClassName="text-xs font-semibold" sinSombra>
+                    Editar stock
+                  </BotonPill>
+                  <BotonPill color="#fecaca" variante="borde" textoColor="#ef4444" onPress={() => eliminarProducto(p.id)} className="px-4 py-2" textClassName="text-xs font-semibold" sinSombra>
+                    Eliminar
+                  </BotonPill>
                 </View>
-              </Pressable>
-              <View className="mt-4 flex-row gap-3">
-                <BotonPill color="#486440" variante="borde" textoColor="#364a2d" onPress={() => irStock(p.id)} className="flex-1 py-2" textClassName="text-xs font-semibold" sinSombra>
-                  Editar stock
-                </BotonPill>
-                <BotonPill color="#fecaca" variante="borde" textoColor="#ef4444" onPress={() => eliminarProducto(p.id)} className="px-4 py-2" textClassName="text-xs font-semibold" sinSombra>
-                  Eliminar
-                </BotonPill>
-              </View>
-            </View>
+              }
+            />
           ))}
         </View>
       )}
