@@ -1,11 +1,13 @@
 import { useState, type ReactNode } from "react";
 import { Pressable, TextInput, View } from "react-native";
+import { Image } from "expo-image";
 import Svg, { Circle, Path } from "react-native-svg";
 
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C } from "@/lib/estilos";
+import { IMAGENES } from "@/lib/imagenes";
 
 /** Marcas de tarjeta que acompañan a cada medio de pago */
 export function MarcasTarjeta() {
@@ -24,13 +26,9 @@ export function MarcasTarjeta() {
   );
 }
 
+/** Logotipo oficial de PayPal (assets/logos/paypal.png, 750×193, fondo transparente); `size` es la altura */
 export function LogoPayPal({ size = 17 }: { size?: number }) {
-  return (
-    <Texto className="font-bold italic" style={{ fontSize: size }}>
-      <Texto className="font-bold italic text-[#003087]" style={{ fontSize: size }}>Pay</Texto>
-      <Texto className="font-bold italic text-[#009CDE]" style={{ fontSize: size }}>Pal</Texto>
-    </Texto>
-  );
+  return <Image source={IMAGENES["/logos/paypal.png"]} accessibilityLabel="PayPal" contentFit="contain" style={{ height: size, width: Math.round(size * (750 / 193)) }} />;
 }
 
 export type Resumen = { lineas: { t: string; v: string }[]; subtotal: string; /** Líneas entre el subtotal y el total (ITBIS, envío) */ despues?: { t: string; v: string }[]; total: string };

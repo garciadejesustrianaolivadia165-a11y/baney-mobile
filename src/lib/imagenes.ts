@@ -63,6 +63,7 @@ export const IMAGENES = {
   "/logos/Logo_Horizontal_baney_png.png": require("../../assets/logos/Logo_Horizontal_baney_png.png"),
   "/logos/Logotipo_BANEY.jpg": require("../../assets/logos/Logotipo_BANEY.jpg"),
   "/logos/Logotipo_BANEY.png": require("../../assets/logos/Logotipo_BANEY.png"),
+  "/logos/paypal.png": require("../../assets/logos/paypal.png"),
 } as const satisfies Record<string, number>;
 
 export type RutaImagen = keyof typeof IMAGENES;
