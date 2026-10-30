@@ -10,7 +10,7 @@ import Texto from "@/components/ui/texto";
 import { imagen } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { agregarAlCarrito } from "@/lib/carrito";
-import { buscarPedidoCliente, pesos, subtotalPedido, totalPedido, usePedidosCliente } from "@/lib/pedidos-cliente";
+import { buscarPedidoCliente, cancelarPedidoCliente, pesos, subtotalPedido, totalPedido, usePedidosCliente } from "@/lib/pedidos-cliente";
 import { MapaPedido } from "../../dashboard/bandeja/pedidos/[id]";
 
 // Detalle de un pedido del cliente: misma tarjeta de "Detalles De Pedido" del proveedor
@@ -107,7 +107,7 @@ export default function PedidoCliente() {
               Pedir de nuevo
             </BotonPill>
             {pedido.estado === "En camino" && (
-              <BotonPill color="#f87171" variante="borde" textoColor="#ef4444" className="px-5 py-3" textClassName="font-sans text-sm" sinSombra>
+              <BotonPill color="#f87171" variante="borde" textoColor="#ef4444" onPress={() => cancelarPedidoCliente(pedido.id)} className="px-5 py-3" textClassName="font-sans text-sm" sinSombra>
                 Cancelar
               </BotonPill>
             )}

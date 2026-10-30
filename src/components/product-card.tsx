@@ -7,6 +7,7 @@ import Svg, { Path } from "react-native-svg";
 import Icono from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { agregarAlCarrito } from "@/lib/carrito";
+import { alternarFavorito, useFavoritos } from "@/lib/favoritos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import type { Product } from "@/types/product";
@@ -38,7 +39,7 @@ function Accion({ icono, texto, onPress, className = "" }: { icono: number; text
 export default function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
   const [acciones, setAcciones] = useState(false);
-  const [favorito, setFavorito] = useState(!!product.isFavorite);
+  const favorito = useFavoritos().productos.some((f) => f.id === product.id);
   const [agregado, setAgregado] = useState(false);
   const currency = product.currency ?? "RD$";
   const categoria = (product as Product & { categoria?: string }).categoria;
@@ -84,7 +85,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={favorito ? "Quitar de favoritos" : "Agregar a favoritos"}
-          onPress={() => setFavorito((f) => !f)}
+          onPress={() => alternarFavorito(product)}
           hitSlop={6}
           className="mt-1 self-start"
         >

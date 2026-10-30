@@ -74,6 +74,12 @@ const leer = () => pedidos;
 export const usePedidosCliente = () => useSyncExternalStore(suscribir, leer, leer);
 export const buscarPedidoCliente = (id: string | undefined) => pedidos.find((p) => p.id === id);
 
+/** El cliente cancela un pedido que aún va en camino */
+export function cancelarPedidoCliente(id: string) {
+  pedidos = pedidos.map((p) => (p.id === id && p.estado === "En camino" ? { ...p, estado: "Cancelado" } : p));
+  oyentes.forEach((f) => f());
+}
+
 /** Crea el pedido al confirmar el checkout y lo pone primero en el historial */
 export function crearPedidoCliente(items: ItemCarrito[], datos: { direccion: string; envio: number; metodoPago: string; entrega: PedidoCliente["entrega"] }) {
   const primero = items[0]?.producto.seller;

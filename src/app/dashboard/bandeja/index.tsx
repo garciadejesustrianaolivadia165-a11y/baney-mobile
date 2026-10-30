@@ -6,14 +6,7 @@ import FiltroPeriodo, { formatearPeriodo } from "@/components/dashboard/filtro-p
 import { Barras, CabeceraGrafico, Cifra, Dona, Leyenda, Lineas, Tarjeta } from "@/components/dashboard/graficos";
 import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import TablaPedidos from "@/components/dashboard/tabla-pedidos";
-
-const IMG = "/images/image_home";
-
-const pedidos = [
-  { id: "00242772362", cliente: "Cesar Valdez", fecha: "25/2/2026", img: `${IMG}/image_home_09.png`, status: "COMPLETADO", descripcion: "Plátanos Banilejos 12 Dz", precio: "$ 135,000.00" },
-  { id: "00242772363", cliente: "Mini-Market Manolo", fecha: "25/2/2026", img: `${IMG}/image_home_12.png`, status: "EN PROCESO", descripcion: "Pimientos Importados", precio: "$ 5,000.00" },
-  { id: "00242772364", cliente: "Mini-Market Manolo", fecha: "25/2/2026", img: `${IMG}/image_home_12.png`, status: "NO INICIADO", descripcion: "Pimientos Importados", precio: "$ 5,000.00" },
-];
+import { filaPedido, usePedidosProveedor } from "@/lib/pedidos-proveedor";
 
 // Alturas de las barras del gráfico de ventas (q1 a q4)
 const barrasVentas = [55, 40, 70, 48, 30, 60, 75, 42, 52, 38, 65, 45, 58, 35, 68, 72];
@@ -44,6 +37,8 @@ export default function Inbox() {
   const router = useRouter();
   const [perStatus, setPerStatus] = useState("Semana");
   const [perVentas, setPerVentas] = useState("Semana");
+  // Los 4 más recientes; "Ver Todos" abre la lista completa con Aceptar/Rechazar
+  const pedidos = usePedidosProveedor().slice(0, 4).map(filaPedido);
 
   return (
     <Pagina>

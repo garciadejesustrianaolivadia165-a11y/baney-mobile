@@ -9,7 +9,7 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
-import { pesos } from "@/lib/pedidos-cliente";
+import { pesosRD, totalPedido, usePedidosProveedor } from "@/lib/pedidos-proveedor";
 import { buscarPedidoEnCurso } from "@/lib/rutas";
 import { MapaPedido, TELEFONO, UBICACION } from "../bandeja/pedidos/[id]";
 import { AccionesOrden } from "./index";
@@ -17,7 +17,9 @@ import { AccionesOrden } from "./index";
 const ESTADO: Record<string, [string, string, string]> = {
   "EN PROCESO": ["bg-warning-200", "text-warning-800", "En camino"],
   COMPLETADO: ["bg-success-100", "text-success-700", "Entregado"],
-  "NO INICIADO": ["bg-neutral-100", "text-neutral-600", "Por recoger"],
+  NUEVO: ["bg-[#E3F0FF]", "text-[#1d4ed8]", "Por aceptar"],
+  RECHAZADO: ["bg-error-200", "text-error-700", "Rechazado"],
+  CANCELADO: ["bg-neutral-200", "text-neutral-600", "Cancelado"],
 };
 
 // Detalle de un pedido en curso (Rutas): mapa, hora de llegada, transportista con
@@ -26,6 +28,7 @@ const ESTADO: Record<string, [string, string, string]> = {
 export default function RouteDetail() {
   const { pedidoId } = useLocalSearchParams<{ pedidoId: string }>();
   const router = useRouter();
+  usePedidosProveedor();
   const enCurso = buscarPedidoEnCurso(pedidoId);
 
   if (!enCurso) {
@@ -36,8 +39,10 @@ export default function RouteDetail() {
     );
   }
 
-  const { cliente, pedido, transportista, origen, llegadaMin, km, avance, item } = enCurso;
+  const { pedido, transportista, origen, llegadaMin, km } = enCurso;
+  const { cliente, avance } = pedido;
   const [fondo, color, estado] = ESTADO[pedido.estado] ?? ESTADO["EN PROCESO"];
+  const enCamino = pedido.estado === "EN PROCESO";
 
   return (
     <Pagina>
@@ -52,14 +57,16 @@ export default function RouteDetail() {
       <View style={SOMBRA.card} className="rounded-[1.75rem] bg-white p-5">
         <View className="flex-row items-center justify-between gap-3">
           <View className="min-w-0 flex-1">
-            <Texto className="font-sans text-[22px] font-bold text-primary-600">{llegadaMin === 0 ? "Entregado" : `Llega en ${llegadaMin} min`}</Texto>
-            {llegadaMin > 0 && <Texto className="font-sans text-sm font-semibold text-neutral-500">{km} km restantes</Texto>}
+            <Texto className="font-sans text-[22px] font-bold text-primary-600">{enCamino ? `Llega en ${llegadaMin} min` : estado}</Texto>
+            {enCamino && <Texto className="font-sans text-sm font-semibold text-neutral-500">{km} km restantes</Texto>}
           </View>
           <View className={`rounded-full px-3 py-1 ${fondo}`}>
             <Texto className={`text-xs font-semibold ${color}`}>{estado}</Texto>
           </View>
         </View>
-        <Texto className="mt-1.5 font-sans text-sm leading-relaxed text-neutral-500">{llegadaMin === 0 ? "El pedido ya fue entregado al cliente." : "Ruta más rápida ahora debido a las condiciones del tráfico."}</Texto>
+        <Texto className="mt-1.5 font-sans text-sm leading-relaxed text-neutral-500">
+          {pedido.estado === "COMPLETADO" ? "El pedido ya fue entregado al cliente." : pedido.estado === "NUEVO" ? "Acepta el pedido para asignar un transportista." : enCamino ? "Ruta más rápida ahora debido a las condiciones del tráfico." : "Este pedido no sigue en camino."}
+        </Texto>
 
         <View className="mt-6 justify-center">
           <View className="h-3 w-full rounded-full bg-[#dfe3d3]" />
@@ -147,16 +154,18 @@ export default function RouteDetail() {
           </View>
         </View>
 
-        <View className="mt-5">
-          <ItemProducto img={item.img} nombre={item.nombre} categoria="Pedido" detalle={item.cantidad} precio={pesos(pedido.total)} />
+        <View className="mt-5 gap-3">
+          {pedido.items.map((item, i) => (
+            <ItemProducto key={`${item.nombre}-${i}`} img={item.img} nombre={item.nombre} categoria={item.categoria} detalle={item.cantidad} precio={pesosRD(item.precio)} />
+          ))}
         </View>
         <View className="mt-4 flex-row items-center justify-between border-t-2 border-neutral-800 pt-3">
           <Texto className="text-xs font-semibold uppercase tracking-wide text-neutral-700">Total</Texto>
-          <Texto className="font-sans text-base font-bold text-neutral-900">{pesos(pedido.total)}</Texto>
+          <Texto className="font-sans text-base font-bold text-neutral-900">{pesosRD(totalPedido(pedido))}</Texto>
         </View>
       </View>
 
-      <AccionesOrden onDetalles={() => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: pedido.id } })} />
+      <AccionesOrden pedido={pedido} onDetalles={() => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: pedido.id } })} />
     </Pagina>
   );
 }

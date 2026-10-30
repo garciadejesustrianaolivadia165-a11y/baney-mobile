@@ -11,6 +11,7 @@ import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { agregarAlCarrito } from "@/lib/carrito";
+import { alternarFavorito, useFavoritos } from "@/lib/favoritos";
 import { CATALOGO, FOTO_PRODUCTO, GALERIA, LOREM_PRODUCTO, RELACIONADOS } from "@/lib/productos";
 import type { Product } from "@/types/product";
 
@@ -31,13 +32,15 @@ export default function ProductDetail() {
   const base = CATALOGO.find((p) => p.id === id);
   const producto: Product = base ?? { id: id ?? "guineos", name: "Guineos Criollos", image: FOTO_PRODUCTO, price: 300, currency: "RD$ ", rating: 5, seller: { name: "Juan Pedro García", avatar: "/images/image_home/image_home_09.png", location: "AgroMerca RD" } };
   const [agregado, setAgregado] = useState(false);
+  const favoritos = useFavoritos().productos;
+  const enDeseos = favoritos.some((f) => f.id === producto.id);
   const relacionado = (r: { id: string; nombre: string; img: string }): Product => ({ id: r.id, name: r.nombre, image: r.img, price: 100, currency: "RD$ ", rating: 4.5, seller: producto.seller });
 
   // Mismo orden de colores que la referencia
   const acciones = [
     { t: "Comprar ahora", color: "#ef4444", texto: "#fff", icono: false, onPress: () => { agregarAlCarrito(producto, 1, { categoria: base?.categoria }); router.push("/cliente/carrito"); } },
     { t: agregado ? "¡Agregado al carrito!" : "Agregar al Carrito", color: "#5c641d", texto: "#fff", icono: true, onPress: () => { agregarAlCarrito(producto, 1, { categoria: base?.categoria }); setAgregado(true); setTimeout(() => setAgregado(false), 1500); } },
-    { t: "Agregar a lista de deseos", color: "#cdaf86", texto: "#20221f", icono: false, onPress: () => router.push("/dashboard/favoritos") },
+    { t: enDeseos ? "Quitar de la lista de deseos" : "Agregar a lista de deseos", color: "#cdaf86", texto: "#20221f", icono: false, onPress: () => { if (alternarFavorito(producto)) router.push("/cliente/favoritos"); } },
   ];
 
   return (
@@ -95,8 +98,8 @@ export default function ProductDetail() {
                         <Icono d={ICONOS.estrella} size={12} color="#fff" relleno />
                       </View>
                       <View className="absolute right-3 top-3 flex-row items-center gap-3">
-                        <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} a favoritos`} hitSlop={6} className="active:scale-125">
-                          <Icono d={CORAZON} size={20} color="#fff" />
+                        <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} a favoritos`} onPress={() => alternarFavorito(relacionado(r))} hitSlop={6} className="active:scale-125">
+                          <Icono d={CORAZON} size={20} color={favoritos.some((f) => f.id === r.id) ? "#ef4444" : "#fff"} relleno={favoritos.some((f) => f.id === r.id)} />
                         </Pressable>
                         <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} al carrito`} onPress={() => agregarAlCarrito(relacionado(r))} hitSlop={6} className="active:scale-125">
                           <Icono d={CARRITO} size={20} color="#fff" />

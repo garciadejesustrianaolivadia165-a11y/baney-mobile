@@ -9,25 +9,15 @@ import TablaPedidos from "@/components/dashboard/tabla-pedidos";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
+import { alternarDestacado, useFavoritos } from "@/lib/favoritos";
 import { useGuia, type Rect } from "@/lib/guia";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { useMisProductos } from "@/lib/mis-productos";
+import { filaPedido, resumenAlerta, usePedidosProveedor } from "@/lib/pedidos-proveedor";
 import { TarjetaAlerta } from "../(app)/alertas";
 
 const IMG = "/images/image_home";
-
-// Nuevos pedidos con el mismo formato de las alertas de transporte
-const nuevosPedidos = [
-  { id: "00242772362", cliente: "Cesar Valdez", hora: "10:45 AM", texto: "Cesar Valdez pidió Plátanos Banilejos 12 Dz · 0/8 completo", nueva: true, destacada: true },
-  { id: "00242772363", cliente: "Mini-Market Manolo", hora: "09:12 AM", texto: "Mini-Market Manolo pidió Pimientos Importados · 50/135 completo", nueva: true },
-  { id: "00242772364", cliente: "Mini-Market Manolo", hora: "Ayer, 04:30 PM", texto: "Mini-Market Manolo pidió Pimientos Importados · 2/8 completo" },
-];
-
-const pedidos = [
-  { id: "00242772362", cliente: "Cesar Valdez", fecha: "25/2/2026", img: `${IMG}/image_home_09.png`, descripcion: "Plátanos Banilejos 12 Dz", precio: "$ 135,000.00" },
-  { id: "00242772363", cliente: "Mini-Market Manolo", fecha: "25/2/2026", img: `${IMG}/image_home_12.png`, descripcion: "Pimientos Importados", precio: "$ 5,000.00" },
-];
 
 // Pasos de la guía interactiva: 0–3 enfocan una sección del inicio; el último, el menú lateral
 const MENU_ICONOS = {
@@ -70,9 +60,12 @@ const PEDIDO = "M6 2l1.5 4h9L18 2M3 6h18l-2 14H5L3 6zM9 10v4M15 10v4";
 export default function DashboardOverview() {
   const router = useRouter();
   const productos = useMisProductos();
+  const todosPedidos = usePedidosProveedor();
+  const nuevosPedidos = todosPedidos.filter((p) => p.estado === "NUEVO");
+  const pedidos = todosPedidos.filter((p) => p.estado === "EN PROCESO").map(filaPedido);
   // null = guía apagada; 0..n = paso activo
   const [paso, setPaso] = useState<number | null>(null);
-  const [favoritos, setFavoritos] = useState<string[]>([]);
+  const favoritos = useFavoritos().destacados;
 
   // Foco de la guía: cada sección guarda su ref y su posición en la página; al cambiar
   // de paso se desplaza hasta ella y se mide en coordenadas de ventana para el hueco.
@@ -154,16 +147,21 @@ export default function DashboardOverview() {
       {/* Nuevos pedidos: mismas alertas que la versión de transporte */}
       <View {...seccion(1)}>
         <Texto className="font-sans text-xl font-semibold text-[#3F443D]">Nuevos pedidos</Texto>
-        {nuevosPedidos.map((n) => (
-          <Pressable key={n.id + n.hora} accessibilityRole="link" accessibilityLabel={`Ver pedido de ${n.cliente}`} onPress={() => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: n.id } })} className="active:opacity-80">
+        {nuevosPedidos.length === 0 && (
+          <View style={SOMBRA.card} className="mt-3 rounded-2xl bg-white p-5">
+            <Texto className="text-sm text-neutral-500">No tienes pedidos nuevos por revisar. Los pedidos que aceptes aparecen abajo, en "Pedidos En Curso".</Texto>
+          </View>
+        )}
+        {nuevosPedidos.map((n, i) => (
+          <Pressable key={n.id} accessibilityRole="link" accessibilityLabel={`Ver pedido de ${n.cliente.nombre}`} onPress={() => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: n.id } })} className="active:opacity-80">
             <TarjetaAlerta
-              destacada={n.destacada}
-              nueva={n.nueva}
-              fondoIcono={n.destacada ? "bg-error-100" : "bg-success-100"}
-              icono={<Icono d={PEDIDO} size={20} color={n.destacada ? "#ef4444" : "#059669"} strokeWidth={1.8} />}
+              destacada={i === 0}
+              nueva
+              fondoIcono={i === 0 ? "bg-error-100" : "bg-success-100"}
+              icono={<Icono d={PEDIDO} size={20} color={i === 0 ? "#ef4444" : "#059669"} strokeWidth={1.8} />}
               titulo="Nuevo Pedido"
               hora={n.hora}
-              texto={n.texto}
+              texto={resumenAlerta(n)}
               accion="Ver pedido"
             />
           </Pressable>
@@ -227,7 +225,7 @@ export default function DashboardOverview() {
                       <Pressable
                         accessibilityRole="button"
                         accessibilityLabel={fav ? "Quitar de favoritos" : "Agregar a favoritos"}
-                        onPress={() => setFavoritos((f) => (fav ? f.filter((x) => x !== p.id) : [...f, p.id]))}
+                        onPress={() => alternarDestacado(p.id)}
                         hitSlop={6}
                       >
                         <Icono d={CORAZON} size={24} color={fav ? "#ef4444" : "#bdc1b9"} relleno />
@@ -244,7 +242,13 @@ export default function DashboardOverview() {
       {/* Pedidos En Curso */}
       <View {...seccion(3)}>
         <TituloSeccion titulo="Pedidos En Curso" enlace="Ver Todos" href="/dashboard/rutas" />
-        <TablaPedidos pedidos={pedidos} onFila={(p) => router.push({ pathname: "/dashboard/rutas/[pedidoId]", params: { pedidoId: p.id } })} />
+        {pedidos.length === 0 ? (
+          <View style={SOMBRA.card} className="mt-4 rounded-3xl bg-white p-5">
+            <Texto className="text-sm text-neutral-500">Ningún pedido en camino ahora mismo.</Texto>
+          </View>
+        ) : (
+          <TablaPedidos pedidos={pedidos} onFila={(p) => router.push({ pathname: "/dashboard/rutas/[pedidoId]", params: { pedidoId: p.id } })} />
+        )}
       </View>
     </Pagina>
   );

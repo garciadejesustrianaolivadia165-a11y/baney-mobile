@@ -13,6 +13,9 @@ export function StatusChip({ status }: { status: string }) {
     COMPLETADO: ["bg-success-100", "text-success-700"],
     "EN PROCESO": ["bg-warning-200", "text-warning-800"],
     "NO INICIADO": ["bg-error-200", "text-error-700"],
+    NUEVO: ["bg-[#E3F0FF]", "text-[#1d4ed8]"],
+    RECHAZADO: ["bg-error-200", "text-error-700"],
+    CANCELADO: ["bg-neutral-200", "text-neutral-600"],
   };
   const [fondo, texto] = estilos[status] ?? ["bg-success-100", "text-success-700"];
   return (

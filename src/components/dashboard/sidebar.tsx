@@ -32,11 +32,13 @@ const PANEL: Record<RolPanel, Item[]> = {
     { label: "Mis productos", href: "/dashboard/productos", ruta: "/dashboard/productos", icon: IMAGENES["/images/task-square.png"] },
     { label: "Clientes", href: "/dashboard/clientes", ruta: "/dashboard/clientes", icon: IMAGENES["/images/people.png"] },
     { label: "Rutas", href: "/dashboard/rutas", ruta: "/dashboard/rutas", icon: IMAGENES["/images/people.png"] },
+    { label: "Favoritos", href: "/dashboard/favoritos", ruta: "/dashboard/favoritos", svg: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" },
   ],
   cliente: [
     { label: "Marketplace", href: "/cliente", ruta: "/cliente", icon: IMAGENES["/images/home.png"], exacta: true },
     { label: "Carrito", href: "/cliente/carrito", ruta: "/cliente/carrito", svg: "M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L20 8H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" },
     { label: "Historial", href: "/cliente/historial", ruta: "/cliente/historial", icon: IMAGENES["/images/task-square.png"] },
+    { label: "Favoritos", href: "/cliente/favoritos", ruta: "/cliente/favoritos", svg: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" },
     { label: "Notificaciones", href: "/cliente/notificaciones", ruta: "/cliente/notificaciones", icon: IMAGENES["/images/direct-inbox.png"] },
   ],
 };
