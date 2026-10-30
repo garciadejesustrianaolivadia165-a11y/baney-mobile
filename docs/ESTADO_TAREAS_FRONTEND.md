@@ -2,7 +2,13 @@
 
 Fecha del análisis: 2026-10-30 · Commit analizado: `a3f58d8` de `caneyRD/baney-frontend-mobile`.
 
-Fuente: los 23 issues con etiqueta `frontend` del repo `caneyRD/baney-frontend-mobile` (son los ítems de frontend del tablero https://github.com/orgs/caneyRD/projects/1). Todos pertenecen al hito **Período 1 · Semanas 1–4** (Sprints S01 y S02, 2026-09-21 → 2026-10-18), módulos **Auth Service** y **User Service**, y cada uno tiene las mismas tres subtareas:
+Fuente: los 23 issues con etiqueta `frontend` del repo `caneyRD/baney-frontend-mobile` (son los ítems de frontend del tablero https://github.com/orgs/caneyRD/projects/1).
+
+### Cómo se cargó el tablero (cuaderno `BANEY_importar_GitHub_Colab.ipynb`)
+
+- El cuaderno lee `BANEY_Cronograma_OFICIAL_2026-09-28.xlsx` (hoja "04 Casos de Uso"): **418 casos de uso** y 10 integraciones externas. Por cada caso crea un issue padre en `baney-backend`, un sub-issue `-FE` en el repo de frontend (configurado como `baney-frontend`, hoy `baney-frontend-mobile`) y un sub-issue `-OPS` en `baney-infra`, y añade el padre al Project con los campos Fase, Período, Sprint, Módulo, h Frontend, Status, etc.
+- **Solo se ejecutó el Paso 7** (`importar(periodo=1)`): 23 casos, 23/23 sin error. El Paso 8 (`importar()` con los 395 restantes), el Paso 9 (integraciones) y el Paso 10 (verificación) no tienen salida, es decir, no se corrieron.
+- Por eso el tablero hoy contiene únicamente Auth Service y User Service. Las tareas de frontend de Transporte, Payment, Chat, Notification, Admin, Mercado, etc. existen en el Excel pero no en GitHub. Para completar este análisis con precisión hacen falta el Excel o la ejecución del Paso 8 (antes conviene poner `REPO_FRONTEND = "baney-frontend-mobile"` en la celda de configuración). Todos pertenecen al hito **Período 1 · Semanas 1–4** (Sprints S01 y S02, 2026-09-21 → 2026-10-18), módulos **Auth Service** y **User Service**, y cada uno tiene las mismas tres subtareas:
 
 1. Pantallas, estados y validaciones
 2. Integración con las APIs del backend
