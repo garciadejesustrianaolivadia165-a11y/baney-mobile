@@ -12,10 +12,10 @@ Leyenda: ✅ hecho · 🟡 parcial · ❌ pendiente.
 | User Service (11 issues del tablero) | 11 ✅ | 0 / 11 ❌ | 0 / 11 ❌ |
 | Transporte (prototipo Fase 1, sin issues aún) | ✅ onboarding, solicitud en 3 pasos, confirmación, mapa cliente/transportista, solicitudes cercanas, detalle de viaje, historial, alertas, flota, alta de camión, tracking | ❌ | ❌ |
 | Mercado · cliente (Fase 2, sin issues aún) | ✅ marketplace, ficha, carrito, entrega y pago, tarjeta, confirmación, historial, detalle de pedido, notificaciones, perfil, pagos, configuración | ❌ | ❌ |
-| Mercado · proveedor (Fase 2, sin issues aún) | ✅ inicio con guía, bandeja, pedidos, detalle, finanzas (5 vistas), productos, alta, stock, rutas, detalle de ruta, clientes, detalle, otros proveedores, perfil, pagos, configuración · ❌ Favoritos y Mis pedidos (marcadores) | ❌ | ❌ |
-| Notification / Chat / Payment Service | 🟡 notificaciones y alertas con datos locales; pasarela de pago y PayPal solo visuales · ❌ chat no existe | ❌ | ❌ |
+| Mercado · proveedor (Fase 2, sin issues aún) | ✅ inicio con guía, bandeja, pedidos con estado, detalle con acciones, finanzas (5 vistas), productos, alta, stock, rutas, detalle de ruta, clientes, detalle, otros proveedores, favoritos, perfil, pagos, configuración | ❌ | ❌ |
+| Notification / Chat / Payment Service | ✅ notificaciones y alertas, pasarela de tarjeta y PayPal simulado, chat con lista y conversación (todo con datos locales) | ❌ | ❌ |
 
-Cifras: 80 archivos de pantalla en `src/app/`, 2 marcadores restantes, 0 llamadas HTTP, 0 pruebas automatizadas.
+Cifras: 83 archivos de pantalla en `src/app/`, 0 marcadores, 0 llamadas HTTP, 16 pruebas automatizadas.
 
 ## 2. Tablero caneyRD · Proyecto 1 (23 issues de frontend)
 
@@ -51,17 +51,19 @@ Cada issue tiene tres casillas (pantallas · integración · pruebas). **Ninguna
 
 ## 3. Lo que falta en frontend (sin contar la API)
 
-Ordenado por lo que más se nota al usar la app:
+Todo lo listado aquí el 2026-10-30 por la mañana quedó resuelto el mismo día (ver sección 5), salvo lo que se descartó:
 
-1. **Favoritos del proveedor** (`dashboard/favoritos.tsx`): marcador "Favorites". El corazón del inicio y del marketplace solo cambia de color; falta un almacén `lib/favoritos.ts` y la lista.
-2. **Mis pedidos del proveedor** (`dashboard/mis-pedidos.tsx`): marcador "MyOrders". Debe listar lo que el proveedor compra a otros (reutilizando el historial del cliente).
-3. **Detalle de pedido del proveedor con datos reales** (`dashboard/bandeja/pedidos/[id].tsx`): muestra siempre "Lechuga importada" ×3 y "#12345678910" sin importar el pedido abierto; debe leer el pedido (`lib/clientes.ts` / `lib/rutas.ts`) como ya hace el detalle de ruta. `dashboard/rutas/index.tsx` muestra "WAYNE MANOR".
-4. **Acciones de pedido sin efecto**: "Aceptar orden" / "Rechaza orden" (rutas), "Agregar Ítems" / "Cancelar orden" (detalle), "Cancelar" (pedido del cliente), aceptar/rechazar de la bandeja. Falta un almacén de estado del pedido para que cambien el chip y desaparezcan de "Nuevos pedidos".
-5. **Catálogo de ejemplo repetido**: el marketplace son 16 copias de "Vegetales Variados" con la misma foto; la ficha y el home llevan "Lorem ipsum". Conviene un catálogo variado (nombres, fotos, precios, categorías) para la demo.
-6. **Tracking del transporte** (`(app)/tracking.tsx`): solo mapa; falta la misma tarjeta de llegada y transportista que ahora tiene Rutas (reutilizar).
-7. **PayPal**: "Ir a plataforma de pago" confirma directo; falta la pantalla intermedia simulada.
-8. **Chat** (Chat Service, Período 5): no existe ninguna pantalla; el botón "Mensaje" abre los SMS.
-9. **Pruebas de UI**: configurar `jest-expo` + `@testing-library/react-native` y una prueba por issue.
+- ~~Favoritos del proveedor~~ ✅ `dashboard/favoritos.tsx` + `cliente/favoritos.tsx` con `lib/favoritos.ts`.
+- ~~Mis pedidos del proveedor~~ ❌ descartado: el proveedor no compra; la pantalla se eliminó.
+- ~~Detalle de pedido con datos reales~~ ✅ `lib/pedidos-proveedor.ts`; bandeja, detalle y rutas leen el pedido abierto.
+- ~~Acciones de pedido sin efecto~~ ✅ aceptar, rechazar, cancelar, marcar entregado, agregar/quitar ítems y cancelar del cliente cambian el estado en todas las pantallas.
+- ~~Catálogo repetido y Lorem~~ ✅ 16 productos reales con descripción y unidad; home y ficha con textos reales.
+- ~~Tracking solo mapa~~ ✅ tarjetas de llegada y transportista compartidas con Rutas; `/tracking` pasó a ruta suelta.
+- ~~PayPal sin pantalla intermedia~~ ✅ `pasarela-paypal.tsx` (acceso, confirmación, procesando).
+- ~~Chat~~ ✅ `/chat` y `/chat/[id]` con respuesta simulada, enlazado desde "Mensaje" y el menú.
+- ~~Pruebas de UI~~ ✅ 16 pruebas (`npm test`) de almacenes, login, OTP y requisitos de contraseña; corren en CI.
+
+Pendiente menor de frontend: afinar pixel a pixel contra el Figma en dispositivo y sustituir las fotos de producto repetidas cuando se exporten más del Figma.
 
 ## 4. Lo que falta de API (para el final)
 
@@ -76,4 +78,5 @@ Ordenado por lo que más se nota al usar la app:
 - Cuenta: completar perfil, direcciones, documentos, eliminar cuenta, preferencias persistentes, configuración del proveedor.
 - Checkout completo del cliente con carrito y pedidos en memoria; rutas `/checkout/*` redirigen.
 - `ItemProducto`: la tarjeta verde única para todas las listas de productos.
+- Pedidos del proveedor con estado real y acciones; favoritos del cliente y del proveedor; catálogo real sin Lorem; tracking con tarjetas compartidas; PayPal simulado; chat; 16 pruebas automatizadas en CI.
 - Detalle de ruta completo en teléfono (mapa de vista previa, llegada, transportista con llamar/mensaje, cliente, producto, acciones) y guía interactiva con foco real más el paso del menú.

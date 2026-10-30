@@ -91,12 +91,14 @@ export function EntradaPago({
   opciones,
   value,
   onChange,
+  secreto,
 }: {
   placeholder: string;
   tipo?: "text" | "tel" | "email" | "numero";
   opciones?: string[];
   value?: string;
   onChange?: (v: string) => void;
+  secreto?: boolean;
 }) {
   const [interno, setInterno] = useState("");
   const valor = value ?? interno;
@@ -146,7 +148,8 @@ export function EntradaPago({
       placeholder={placeholder}
       placeholderTextColor="#9AA3AF"
       keyboardType={tipo === "tel" ? "phone-pad" : tipo === "email" ? "email-address" : tipo === "numero" ? "number-pad" : "default"}
-      autoCapitalize={tipo === "email" ? "none" : "sentences"}
+      autoCapitalize={tipo === "email" || secreto ? "none" : "sentences"}
+      secureTextEntry={secreto}
       onFocus={() => setEnfocado(true)}
       onBlur={() => setEnfocado(false)}
       className={`w-full rounded-full border bg-white px-5 py-3.5 font-inter text-[14px] text-[#16202E] ${borde}`}

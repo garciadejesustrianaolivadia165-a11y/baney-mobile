@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, View } from "react-native";
+import { Linking, Pressable, ScrollView, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -9,6 +9,7 @@ import CabeceraVolver from "@/components/movil/cabecera-volver";
 import { Paso } from "@/components/movil/entrada";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
+import { abrirChatCon } from "@/lib/chat";
 import { C, SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { buscarViaje, pesos } from "@/lib/viajes";
@@ -99,10 +100,10 @@ export default function DetalleViaje() {
               {viaje.transportista && <Texto className="mt-1 text-[12px] text-[#4A5720]">Transportista: {viaje.transportista}</Texto>}
             </View>
             {[
-              { l: "Llamar", d: ICONOS.llamar },
-              { l: "Mensaje", d: ICONOS.mensaje },
+              { l: "Llamar", d: ICONOS.llamar, onPress: () => Linking.openURL(`tel:${viaje.telefono.replace(/[^\d+]/g, "")}`) },
+              { l: "Mensaje", d: ICONOS.mensaje, onPress: () => router.push({ pathname: "/chat/[id]", params: { id: abrirChatCon({ nombre: viaje.cliente, avatar: viaje.img, rol: "Cliente" }) } }) },
             ].map((b) => (
-              <Pressable key={b.l} accessibilityRole="button" accessibilityLabel={b.l} className="h-11 w-11 items-center justify-center rounded-2xl bg-[#FDE7E7] active:scale-110">
+              <Pressable key={b.l} accessibilityRole="button" accessibilityLabel={b.l} onPress={b.onPress} className="h-11 w-11 items-center justify-center rounded-2xl bg-[#FDE7E7] active:scale-110">
                 <Icono d={b.d} size={18} color={C.rojo} />
               </Pressable>
             ))}

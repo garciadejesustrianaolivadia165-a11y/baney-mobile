@@ -42,10 +42,10 @@ export default function ProductCard({ product }: { product: Product }) {
   const favorito = useFavoritos().productos.some((f) => f.id === product.id);
   const [agregado, setAgregado] = useState(false);
   const currency = product.currency ?? "RD$";
-  const categoria = (product as Product & { categoria?: string }).categoria;
+  const { categoria, unidad } = product as Product & { categoria?: string; unidad?: string };
 
   function alCarrito() {
-    agregarAlCarrito(product, 1, { categoria });
+    agregarAlCarrito(product, 1, { categoria, unidad });
     setAgregado(true);
     setTimeout(() => setAgregado(false), 1500);
   }
@@ -56,7 +56,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <Image source={imagen(product.image)} accessibilityLabel={product.name} contentFit="cover" style={{ width: "100%", height: "100%" }} />
         {acciones && (
           <View className="absolute inset-0 items-center justify-center gap-3 bg-black/40">
-            <Accion icono={IMAGENES["/images/image_home/Icono_01.png"]} texto="Comprar Ahora" className="bg-primary-600" onPress={() => { agregarAlCarrito(product, 1, { categoria }); router.push("/cliente/carrito"); }} />
+            <Accion icono={IMAGENES["/images/image_home/Icono_01.png"]} texto="Comprar Ahora" className="bg-primary-600" onPress={() => { agregarAlCarrito(product, 1, { categoria, unidad }); router.push("/cliente/carrito"); }} />
             <Accion icono={IMAGENES["/images/image_home/Icono_02.png"]} texto="Ver mas detalles" className="bg-primary-400/90" onPress={() => router.push({ pathname: "/cliente/producto/[id]", params: { id: product.id } })} />
             <Accion icono={IMAGENES["/images/image_home/Icono_03.png"]} texto={agregado ? "¡Agregado!" : "Añadir al Carrito"} className={agregado ? "bg-success-600" : "border-2 border-white bg-transparent"} onPress={alCarrito} />
           </View>

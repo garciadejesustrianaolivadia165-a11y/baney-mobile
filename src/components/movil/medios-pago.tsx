@@ -3,6 +3,7 @@ import { Pressable, View } from "react-native";
 
 import BotonPill from "@/components/movil/boton-pill";
 import FormularioTarjeta from "@/components/movil/formulario-tarjeta";
+import PasarelaPayPal from "@/components/movil/pasarela-paypal";
 import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import { BotonPago, Casilla, EntradaPago, FilaDato, LogoPayPal, MarcasTarjeta, ResumenPago, resumenTransporte, type Resumen } from "@/components/movil/pago";
@@ -20,6 +21,7 @@ export default function MediosPago({ modo, material = "Materiales", resumen, onC
   const [abierto, setAbierto] = useState<string | null>(null);
   const [eligiendo, setEligiendo] = useState(false);
   const [correoPayPal, setCorreoPayPal] = useState("");
+  const [paypalAbierto, setPaypalAbierto] = useState(false);
   const paypal = guardados.find((m) => m.tipo === "paypal");
   const tarjetas = guardados.filter((m) => m.tipo !== "paypal");
   const desglose = resumen ?? resumenTransporte(material);
@@ -68,6 +70,7 @@ export default function MediosPago({ modo, material = "Materiales", resumen, onC
 
   return (
     <View className="gap-4">
+      <PasarelaPayPal visible={paypalAbierto} total={desglose.total} onCancelar={() => setPaypalAbierto(false)} onAprobar={() => { setPaypalAbierto(false); onContinuar?.("PayPal"); }} />
       {tarjetas.map((m) => (
         <View key={m.id}>
           <Cabecera id={m.id}>
@@ -148,7 +151,7 @@ export default function MediosPago({ modo, material = "Materiales", resumen, onC
                 <Casilla>
                   Acepto haber leído los <Texto className="text-[12px] text-[#4A5720] underline">términos y condiciones y políticas de privacidad</Texto> para hacer este pago
                 </Casilla>
-                <BotonPago onPress={() => onContinuar?.("PayPal")}>Ir a plataforma de pago</BotonPago>
+                <BotonPago onPress={() => setPaypalAbierto(true)}>Ir a plataforma de pago</BotonPago>
               </>
             ) : paypal ? (
               <>

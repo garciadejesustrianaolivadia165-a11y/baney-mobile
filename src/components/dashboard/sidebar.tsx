@@ -43,8 +43,12 @@ const PANEL: Record<RolPanel, Item[]> = {
   ],
 };
 const CONFIG: Record<RolPanel, Item[]> = {
-  proveedor: [{ label: "Configuración", href: "/dashboard/configuracion", ruta: "/dashboard/configuracion", svg: iconos.config }],
+  proveedor: [
+    { label: "Mensajes", href: "/chat", ruta: "/chat", svg: ICONOS.mensaje },
+    { label: "Configuración", href: "/dashboard/configuracion", ruta: "/dashboard/configuracion", svg: iconos.config },
+  ],
   cliente: [
+    { label: "Mensajes", href: "/chat", ruta: "/chat", svg: ICONOS.mensaje },
     { label: "Métodos de pago", href: "/cliente/pagos", ruta: "/cliente/pagos", svg: ICONOS.tarjeta },
     { label: "Configuración", href: "/cliente/configuracion", ruta: "/cliente/configuracion", svg: iconos.config },
   ],

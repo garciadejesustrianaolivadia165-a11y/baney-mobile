@@ -28,6 +28,7 @@ export default function Perfil() {
       i: transportista ? ICONOS.camion : ICONOS.empresa,
       href: "/cuenta/empresa",
     },
+    { t: "Mensajes", d: "Chats con clientes y transportistas", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.mensaje, href: "/chat" },
     { t: "Mis direcciones", d: "Lugares de entrega y recogida", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.pin, href: "/cuenta/direcciones" },
     { t: "Mis documentos", d: transportista ? "Cédula, licencia y seguro" : "Cédula y RNC", bg: "bg-[#F7F3E9]", color: "#6B6237", i: ICONOS.empresa, href: "/cuenta/documentos" },
     { t: "Configuración", d: "Notificaciones y seguridad", bg: "bg-[#F1F3F0]", color: "#6B7688", i: ICONOS.ajustes, circulos: [[12, 12, 3]], href: "/cuenta/configuracion" },

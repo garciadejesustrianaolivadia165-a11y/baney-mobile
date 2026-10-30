@@ -17,9 +17,27 @@ import type { Product } from "@/types/product";
 
 const IMG = "/images/image_home";
 
-const LOREM_CORTO = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy.";
-const LOREM_LARGO =
-  "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.";
+const INTRO =
+  "BANEY conecta a productores, transportistas y compradores de República Dominicana en una sola plataforma: publica tu cosecha, consigue quien la mueva y cobra con seguridad, todo desde el teléfono.";
+const TESTIMONIOS = [
+  "Antes vendía la cosecha al primero que llegaba. Con BANEY publico mis plátanos y los compradores me buscan a mí.",
+  "El cacao sale de la finca con un transportista verificado y el pago llega a la cuenta el mismo día de la entrega.",
+  "Nos organizamos entre vecinos para llenar un camión completo y el flete nos sale a la mitad.",
+  "Con los indicadores de ventas sé qué sembrar la próxima temporada. Dejé de adivinar.",
+];
+const ECOSISTEMA_TEXTO = [
+  "Mayorista agrícola que abastece colmados y mercados de todo el país con producto BANEY.",
+  "Cadena de supermercados que compra directo a productores verificados de la plataforma.",
+  "Programa de proveedores locales: fruta y vegetal fresco de la finca al anaquel en 48 horas.",
+  "Logística de última milla para pedidos agropecuarios con tracking en vivo.",
+  "Cooperativa de productores que vende en conjunto para llenar camiones completos.",
+  "Distribuidora de insumos y asistencia técnica para fincas de la plataforma.",
+];
+const FEATURE_TEXTO: Record<number, string> = {
+  0: "Catálogo con precios por unidad de medida, fotos y disponibilidad en tiempo real.",
+  1: "Transporte con matching por cercanía, tracking en vivo y seguro de carga incluido.",
+  2: "Pagos con tarjeta o PayPal y comprobantes fiscales listos para la DGII.",
+};
 
 const heroPersonas = [
   { img: `${IMG}/image_home_01.png`, name: "Jose Pérez", loc: "San Pedro de Macoriz" },
@@ -44,10 +62,10 @@ const ecosistema = [
 const avatarVendedor = `${IMG}/Ellipse 5.png`;
 
 const testimonios: Testimonio[] = [
-  { img: `${IMG}/image_home_06.png`, texto: LOREM_LARGO, nombre: "Jacinto José Reyes", rol: "Productor Primario" },
-  { img: `${IMG}/image_home_07.png`, texto: LOREM_LARGO, nombre: "Hermanos Rodríguez", rol: "Productores de cacao" },
-  { img: `${IMG}/image_home_12.png`, texto: LOREM_LARGO, nombre: "Luisa y Ramón García", rol: "Agricultores" },
-  { img: `${IMG}/image_home_13.png`, texto: LOREM_LARGO, nombre: "Miguel Castillo", rol: "Productor de tomates" },
+  { img: `${IMG}/image_home_06.png`, texto: TESTIMONIOS[0], nombre: "Jacinto José Reyes", rol: "Productor Primario" },
+  { img: `${IMG}/image_home_07.png`, texto: TESTIMONIOS[1], nombre: "Hermanos Rodríguez", rol: "Productores de cacao" },
+  { img: `${IMG}/image_home_12.png`, texto: TESTIMONIOS[2], nombre: "Luisa y Ramón García", rol: "Agricultores" },
+  { img: `${IMG}/image_home_13.png`, texto: TESTIMONIOS[3], nombre: "Miguel Castillo", rol: "Productor de tomates" },
 ];
 
 const productos: Product[] = [
@@ -92,7 +110,7 @@ export default function Home() {
               <Texto className="max-w-xl font-sans text-[32px] font-bold leading-[1.15] text-secondary2-500">
                 <TextoTecleado texto="Fortalece tus conocimientos y habilidades para hacer crecer tu negocio" />
               </Texto>
-              <Texto className="mt-6 max-w-md font-sans text-sm leading-relaxed text-neutral-700">{LOREM_LARGO}</Texto>
+              <Texto className="mt-6 max-w-md font-sans text-sm leading-relaxed text-neutral-700">{INTRO}</Texto>
               <Button href="/dashboard" className="mt-8 self-start px-6 py-2.5" textClassName="text-sm">
                 Ingresa a tu Perfil
               </Button>
@@ -118,11 +136,11 @@ export default function Home() {
 
           {/* Tarjetas informativas */}
           <View className="gap-12 px-6 py-16">
-            {features.map((f) => (
+            {features.map((f, i) => (
               <View key={f.title} className="items-center">
                 <Image source={imagen(f.img)} accessibilityLabel={f.title} contentFit="contain" style={{ width: "100%", aspectRatio: 1 }} />
                 <Texto className="mt-7 max-w-[280px] text-center font-sans text-2xl font-semibold leading-snug text-neutral-900">{f.title}</Texto>
-                <Texto className="mt-3 max-w-[300px] text-center font-sans text-sm leading-relaxed text-neutral-500">{LOREM_CORTO}</Texto>
+                <Texto className="mt-3 max-w-[300px] text-center font-sans text-sm leading-relaxed text-neutral-500">{FEATURE_TEXTO[i] ?? INTRO}</Texto>
               </View>
             ))}
           </View>
@@ -149,7 +167,7 @@ export default function Home() {
                   <Image source={imagen(e.img)} accessibilityLabel={e.name} contentFit="cover" style={{ width: 80, height: 80, borderRadius: 40 }} />
                   <View className="flex-1">
                     <Texto className="font-sans text-xl font-bold text-neutral-900">{e.name}</Texto>
-                    <Texto className="mt-1 font-sans text-sm text-neutral-600">{LOREM_CORTO}</Texto>
+                    <Texto className="mt-1 font-sans text-sm text-neutral-600">{ECOSISTEMA_TEXTO[i % ECOSISTEMA_TEXTO.length]}</Texto>
                   </View>
                 </View>
               ))}

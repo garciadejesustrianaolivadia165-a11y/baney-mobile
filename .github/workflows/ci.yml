@@ -19,5 +19,7 @@ jobs:
         run: npx expo export -p web
       - name: Typecheck
         run: npx tsc --noEmit
+      - name: Pruebas (jest-expo + Testing Library)
+        run: npm test
       - name: Expo doctor
         run: npx expo-doctor

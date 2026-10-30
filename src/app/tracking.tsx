@@ -3,11 +3,15 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 
 import Mapa from "@/components/mapa";
+import { TarjetaContacto, TarjetaLlegada } from "@/components/transporte/tarjetas-ruta";
+import type { Transportista } from "@/lib/rutas";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
 import { IMAGENES } from "@/lib/imagenes";
+
+const TRANSPORTISTA: Transportista = { nombre: "José Rodríguez", avatar: "/images/image_home/image_home_09.png", vehiculo: "Mack Granite (Rojo)", placa: "ABC-1234", telefono: "+18095550177", calificacion: 4.9 };
 
 // ============ VISTA 9: TRACKING ============
 export default function Tracking() {
@@ -45,26 +49,9 @@ export default function Tracking() {
       >
         <View className="mx-auto mb-5 h-[5px] w-12 rounded-full bg-[#E3E6E0]" />
 
-        <View className="flex-row items-center gap-4">
-          <View>
-            <Image source={IMAGENES["/images/image_home/image_home_09.png"]} accessibilityLabel="José Rodríguez" contentFit="cover" style={{ width: 64, height: 64, borderRadius: 32 }} />
-            <View className="absolute -bottom-1 left-1/2 -translate-x-1/2 flex-row items-center gap-0.5 rounded-md bg-warning-400 px-1.5 py-0.5">
-              <Icono d={ICONOS.estrella} size={10} color={C.tinta} relleno />
-              <Texto className="text-[10px] font-bold text-[#16202E]">4.9</Texto>
-            </View>
-          </View>
-          <View className="min-w-0 flex-1">
-            <Texto className="text-[20px] font-bold leading-tight text-[#16202E]">José Rodríguez</Texto>
-            <Texto className="mt-1 text-[14px] leading-snug text-[#6B7688]">Mack Granite (Rojo) • ABC-1234</Texto>
-          </View>
-          {[
-            { l: "Llamar", d: ICONOS.llamar },
-            { l: "Mensaje", d: ICONOS.mensaje },
-          ].map((b) => (
-            <Pressable key={b.l} accessibilityRole="button" accessibilityLabel={b.l} className="h-12 w-12 items-center justify-center rounded-2xl bg-[#FDE7E7] active:scale-110">
-              <Icono d={b.d} size={20} color={C.rojo} />
-            </Pressable>
-          ))}
+        <TarjetaLlegada titulo="Llega en 25 min" detalle="14 km restantes" chip={{ texto: "En camino", fondo: "bg-warning-200", color: "text-warning-800" }} avance={55} origen="Cantera San Pedro" destino="Av. 27 de Febrero, Santo Domingo" />
+        <View className="mt-4">
+          <TarjetaContacto persona={TRANSPORTISTA} subtitulo="Mack Granite (Rojo) • ABC-1234" />
         </View>
 
         <View className="mt-7">

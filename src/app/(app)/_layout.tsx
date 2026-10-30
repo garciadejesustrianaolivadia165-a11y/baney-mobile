@@ -13,7 +13,6 @@ export default function AppLayout() {
       <Tabs.Screen name="perfil" />
       <Tabs.Screen name="transportista" />
       <Tabs.Screen name="transportista-mapa" />
-      <Tabs.Screen name="tracking" options={{ href: null }} />
     </Tabs>
   );
 }

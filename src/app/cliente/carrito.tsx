@@ -25,7 +25,7 @@ export default function Carrito() {
   useEffect(() => {
     if (!producto) return;
     const p = CATALOGO.find((x) => x.id === producto);
-    if (p && !items.some((i) => i.producto.id === p.id)) agregarAlCarrito(p, 1, { categoria: p.categoria });
+    if (p && !items.some((i) => i.producto.id === p.id)) agregarAlCarrito(p, 1, { categoria: p.categoria, unidad: p.unidad });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [producto]);
 
