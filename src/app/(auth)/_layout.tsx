@@ -27,9 +27,9 @@ export default function AuthLayout() {
               <View className="relative w-1/2 overflow-hidden bg-caney-sky">
                 <Image source={IMAGENES["/images/Image_login.png"]} contentFit="cover" contentPosition="bottom" style={{ position: "absolute", bottom: 0, left: 0, width: "115%", height: "60%" }} />
                 <Image source={IMAGENES["/images/granjero.png"]} accessibilityLabel="Productor BANEY usando la plataforma" contentFit="contain" contentPosition="bottom" style={{ position: "absolute", bottom: 0, right: 64, width: "70%", height: "82%" }} />
-                <Pressable accessibilityRole="link" onPress={() => router.push("/home")} className="absolute left-5 top-4">
+                <View className="absolute left-5 top-4">
                   <Image source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]} accessibilityLabel="BANEY" contentFit="contain" style={{ width: 120, height: 36 }} />
-                </Pressable>
+                </View>
               </View>
             )}
 

@@ -4,7 +4,7 @@ import { Modal, Pressable, View } from "react-native";
 import { EntradaPago, LogoPayPal } from "@/components/movil/pago";
 import BotonPill from "@/components/movil/boton-pill";
 import Texto from "@/components/ui/texto";
-import { SOMBRA } from "@/lib/estilos";
+import { C, SOMBRA } from "@/lib/estilos";
 
 /**
  * Pantalla intermedia de PayPal (simulada): inicio de sesión y confirmación del
@@ -46,9 +46,9 @@ export default function PasarelaPayPal({ visible, total, comercio = "BANEY RD", 
               <Texto className="text-[12px] font-semibold text-neutral-600">Cancelar</Texto>
             </Pressable>
           </View>
-          <View className="mt-4 rounded-2xl bg-[#F5F7FA] px-4 py-3">
+          <View className="mt-4 rounded-2xl bg-[#F1F4F2] px-4 py-3">
             <Texto className="text-[12px] text-neutral-500">Pagar a {comercio}</Texto>
-            <Texto className="text-[22px] font-bold text-[#003087]">{total}</Texto>
+            <Texto className="text-[22px] font-bold text-[#16202E]">{total}</Texto>
           </View>
 
           {paso === "acceso" && (
@@ -57,7 +57,7 @@ export default function PasarelaPayPal({ visible, total, comercio = "BANEY RD", 
               <EntradaPago placeholder="Correo electrónico o número de móvil" tipo="email" value={correo} onChange={setCorreo} />
               <EntradaPago placeholder="Contraseña" value={clave} onChange={setClave} secreto />
               {error !== "" && <Texto accessibilityRole="alert" className="text-[12px] text-error-600">{error}</Texto>}
-              <BotonPill color="#0070BA" onPress={entrar} className="mt-1 w-full py-3.5" textClassName="text-[15px]">
+              <BotonPill color={C.oliva} onPress={entrar} className="mt-1 w-full py-3.5" textClassName="text-[15px]">
                 Iniciar sesión
               </BotonPill>
               <Texto className="text-center text-[11px] text-neutral-400">Simulación: cualquier correo válido y una contraseña de 4+ caracteres.</Texto>
@@ -73,18 +73,18 @@ export default function PasarelaPayPal({ visible, total, comercio = "BANEY RD", 
                 <Texto className="mt-2 text-[13px] text-neutral-500">Método</Texto>
                 <Texto className="text-[14px] font-semibold text-[#16202E]">Saldo de PayPal</Texto>
               </View>
-              <BotonPill color="#FFC439" textoColor="#003087" onPress={pagar} className="w-full py-3.5" textClassName="text-[15px]">
+              <BotonPill color={C.oliva} onPress={pagar} className="w-full py-3.5" textClassName="text-[15px]">
                 {`Pagar ${total}`}
               </BotonPill>
               <Pressable accessibilityRole="button" onPress={() => setPaso("acceso")} className="self-center py-1">
-                <Texto className="text-[13px] font-semibold text-[#0070BA]">Usar otra cuenta</Texto>
+                <Texto className="text-[13px] font-semibold text-[#4A5720]">Usar otra cuenta</Texto>
               </Pressable>
             </View>
           )}
 
           {paso === "procesando" && (
             <View className="mt-8 items-center gap-3 pb-4">
-              <View className="h-10 w-10 rounded-full border-4 border-[#0070BA] border-t-transparent" />
+              <View className="h-10 w-10 rounded-full border-4 border-[#4A5720] border-t-transparent" />
               <Texto className="text-[14px] font-semibold text-[#16202E]">Procesando tu pago…</Texto>
             </View>
           )}

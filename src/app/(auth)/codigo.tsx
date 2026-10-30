@@ -6,7 +6,7 @@ import EntradaCodigo, { LARGO_CODIGO } from "@/components/auth/entrada-codigo";
 import Reenviar from "@/components/auth/reenviar";
 import Button from "@/components/ui/button";
 import Texto from "@/components/ui/texto";
-import { actualizarSesion, desbloquear, destinoPorRol, useSesion } from "@/lib/sesion";
+import { actualizarSesion, desbloquear, destinoPorRol } from "@/lib/sesion";
 
 export type FlujoCodigo = "reset" | "correo" | "login";
 
@@ -21,7 +21,6 @@ const TEXTOS: Record<FlujoCodigo, { titulo: string; detalle: string; boton: stri
 export default function Codigo() {
   const router = useRouter();
   const { flujo = "reset", correo = "" } = useLocalSearchParams<{ flujo?: FlujoCodigo; correo?: string }>();
-  const { rol } = useSesion();
   const t = TEXTOS[flujo] ?? TEXTOS.reset;
   const [codigo, setCodigo] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +46,7 @@ export default function Codigo() {
         router.replace("/cuenta/completar");
       } else {
         desbloquear();
-        router.replace(rol ? destinoPorRol() : "/home");
+        router.replace(destinoPorRol());
       }
     }, 600);
   }

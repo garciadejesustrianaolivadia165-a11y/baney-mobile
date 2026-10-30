@@ -29,11 +29,11 @@ export default function Login() {
   const [correo, setCorreo] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [errors, setErrors] = useState<LoginErrors>({});
-  const { rol, bloqueada, intentos } = useSesion();
+  const { bloqueada, intentos } = useSesion();
   const { dosPasos } = usePreferencias();
   const entrar = () => {
     desbloquear();
-    router.replace(rol ? destinoPorRol() : "/home");
+    router.replace(destinoPorRol());
   };
 
   function enviar() {

@@ -12,7 +12,7 @@ export default function CompletarPerfil() {
   const router = useRouter();
   const { rol, perfil } = useSesion();
   const proveedor = rol === "proveedor";
-  const continuar = () => router.replace(rol ? destinoPorRol() : "/home");
+  const continuar = () => router.replace(destinoPorRol());
 
   return (
     <SafeAreaView className="flex-1 bg-white">

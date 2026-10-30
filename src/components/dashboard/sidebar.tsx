@@ -81,7 +81,7 @@ export default function Sidebar({ abierto = false, onCerrar, fijo = false, rol =
       contentContainerClassName="flex-grow p-6"
       showsVerticalScrollIndicator={false}
     >
-      <Pressable accessibilityRole="link" onPress={() => ir(rol === "cliente" ? "/cliente" : "/home")}>
+      <Pressable accessibilityRole="link" onPress={() => ir(rol === "cliente" ? "/cliente" : "/dashboard")}>
         <Image source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]} accessibilityLabel="BANEY" contentFit="contain" style={{ width: 146, height: 44 }} />
       </Pressable>
 
