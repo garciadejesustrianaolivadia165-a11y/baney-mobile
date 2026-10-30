@@ -1,6 +1,6 @@
 # Estado de las tareas de frontend (tablero caneyRD · Proyecto 1)
 
-Fecha del análisis: 2026-10-30 · Commit analizado: `a3f58d8` de `caneyRD/baney-frontend-mobile`.
+Fecha del análisis: 2026-10-30 · Commit analizado: `a3f58d8` de `caneyRD/baney-frontend-mobile`. **Actualizado el mismo día tras construir las pantallas que faltaban (ver "Pantallas construidas el 2026-10-30").**
 
 Fuente: los 23 issues con etiqueta `frontend` del repo `caneyRD/baney-frontend-mobile` (son los ítems de frontend del tablero https://github.com/orgs/caneyRD/projects/1).
 
@@ -20,8 +20,10 @@ Leyenda: ✅ hecho · 🟡 parcial · ❌ no empezado.
 
 | | Pantallas | Integración API | Pruebas |
 |---|---|---|---|
-| Auth Service (12 issues) | 4 ✅ · 3 🟡 · 5 ❌ | 0 / 12 | 0 / 12 |
-| User Service (11 issues) | 7 ✅ · 2 🟡 · 2 ❌ | 0 / 11 | 0 / 11 |
+| Auth Service (12 issues) | 11 ✅ · 0 🟡 · 1 ❌ (#4 Refresh token: no tiene pantalla, es parte de la capa de API) | 0 / 12 | 0 / 12 |
+| User Service (11 issues) | 11 ✅ · 0 🟡 · 0 ❌ | 0 / 11 | 0 / 11 |
+
+Antes de este día el estado era: Auth 4 ✅ · 3 🟡 · 5 ❌ y User 7 ✅ · 2 🟡 · 2 ❌ (las tablas de abajo conservan ese detalle como historial).
 
 - **Lo subido cubre la capa visual de 11 de los 23 casos de uso completos y otros 5 a medias.** Todo funciona con datos locales (`src/lib/*.ts`); no hay ningún `fetch`, cliente HTTP, token ni almacenamiento seguro todavía.
 - **La integración con APIs está en 0 en los 23 issues**, incluidos los dos cerrados (#1 Registro y #2 Login), que siguen con sus tres casillas sin marcar.
@@ -60,6 +62,25 @@ Leyenda: ✅ hecho · 🟡 parcial · ❌ no empezado.
 | #21 | Gestionar métodos de pago | ✅ | `components/movil/medios-pago.tsx` modo `gestion` en `/cuenta/pagos`, `/cliente/pagos` y `/dashboard/pagos`; alta de tarjeta y PayPal; `lib/pagos.ts`; botón "Agregar nuevo método de pago" | Endpoint (tokenización con el Payment Service, Período 5). |
 | #22 | Gestionar preferencias | ✅ | `cuenta/configuracion.tsx` (`ConfiguracionContenido`: push, correo, ofertas, ubicación, dos pasos, cambio de contraseña) reutilizado en `cliente/configuracion.tsx` | `dashboard/configuracion.tsx` del proveedor sigue siendo el marcador "Settings": debe usar `ConfiguracionContenido`. Endpoint de preferencias. |
 | #23 | Eliminar cuenta | ❌ | Nada | Opción "Eliminar mi cuenta" en Configuración con confirmación (contraseña u OTP), pantalla de despedida y endpoint. |
+
+## Pantallas construidas el 2026-10-30 (todas sin API, con datos locales)
+
+| Issue | Pantalla | Ruta / archivo |
+|---|---|---|
+| #5 Forgot password | "¿Olvidaste tu contraseña?" con enlace desde el login | `src/app/(auth)/olvide.tsx` |
+| #7 OTP | Código de 6 dígitos (casillas, autocompletado SMS, reenvío con cuenta atrás, error con "000000") compartido por recuperación, correo y dos pasos | `src/app/(auth)/codigo.tsx`, `components/auth/entrada-codigo.tsx`, `components/auth/reenviar.tsx` |
+| #6 Reset password | Nueva contraseña con requisitos en vivo y pantalla "Contraseña actualizada"; el cambio desde Configuración usa los mismos requisitos | `src/app/(auth)/restablecer.tsx` |
+| #10 Verificación de email | "Revisa tu correo" tras el registro, reenviar, cambiar correo; el registro valida campos y prellena el perfil | `src/app/(auth)/verifica.tsx`, `(auth)/register.tsx` |
+| #11 Bloqueo de cuenta | Contador de intentos en el login ("Te queda 1 intento…") y pantalla "Cuenta bloqueada" con restablecer / soporte | `src/app/(auth)/bloqueada.tsx`, `lib/sesion.ts` (`intentoFallido`, `desbloquear`, `MAX_INTENTOS`) |
+| #8 / #9 OAuth | Botones "Continuar con Google" y "Continuar con Apple" en login y registro (visuales, a la espera del SDK) | `components/ui/apple-button.tsx` |
+| #1 / #2 | Login con "¿Olvidaste tu contraseña?" y segundo factor cuando "Verificación en dos pasos" está activa | `(auth)/login.tsx` |
+| #13 Crear perfil | "Completa tu perfil" tras verificar el correo (foto, provincia, país; el proveedor añade su empresa) con "Omitir por ahora" | `src/app/cuenta/completar.tsx` |
+| #19 Gestionar documentos | "Mis documentos" por rol con estado (sin subir / en revisión / aprobado / rechazado), motivo de rechazo, vencimiento, subir y reemplazar (imagen o PDF) | `src/app/cuenta/documentos.tsx`, `lib/documentos.ts`, `components/ui/subir-archivo.tsx` |
+| #20 Gestionar direcciones | "Mis direcciones" (predeterminada, editar, eliminar) y alta/edición con etiqueta, buscador de lugar, referencia y contacto; chips "Mis direcciones" en la solicitud de transporte | `src/app/cuenta/direcciones.tsx`, `cuenta/direccion.tsx`, `lib/direcciones.ts`, `solicitud.tsx` |
+| #22 Gestionar preferencias | Preferencias persistentes en memoria (`lib/preferencias.ts`), sección "Cuenta" con accesos a direcciones, documentos y eliminar; la Configuración del proveedor deja de ser un marcador | `cuenta/configuracion.tsx`, `dashboard/configuracion.tsx` |
+| #23 Eliminar cuenta | Motivo, contraseña, casilla de confirmación y pantalla "Cuenta eliminada" que vuelve al splash | `src/app/cuenta/eliminar.tsx` |
+
+Accesos: el menú Perfil del cliente y del transportista tiene "Mis direcciones" y "Mis documentos"; los tres roles los tienen también en Configuración → Cuenta.
 
 ## Pendiente transversal (afecta a los 23 issues)
 

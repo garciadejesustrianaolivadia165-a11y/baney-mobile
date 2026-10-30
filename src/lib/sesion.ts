@@ -24,7 +24,19 @@ export type Perfil = {
   licencia: { numero: string; categoria: string; vencimiento: string };
 };
 
-type Sesion = { rol: Rol; busca: Busca; modoAuth: ModoAuth; perfil: Perfil };
+type Sesion = {
+  rol: Rol;
+  busca: Busca;
+  modoAuth: ModoAuth;
+  perfil: Perfil;
+  /** Correo pendiente de verificar tras el registro */
+  correoPendiente: string;
+  /** Intentos fallidos de inicio de sesión (la API decidirá el límite real) */
+  intentos: number;
+  bloqueada: boolean;
+};
+
+export const MAX_INTENTOS = 5;
 
 const PERFIL_INICIAL: Perfil = {
   nombres: "Triana Olivadia",
@@ -39,7 +51,7 @@ const PERFIL_INICIAL: Perfil = {
   licencia: { numero: "402-1234567-8", categoria: "Categoría 4 (vehículos pesados)", vencimiento: "12/2028" },
 };
 
-const INICIAL: Sesion = { rol: null, busca: null, modoAuth: "registro", perfil: PERFIL_INICIAL };
+const INICIAL: Sesion = { rol: null, busca: null, modoAuth: "registro", perfil: PERFIL_INICIAL, correoPendiente: "", intentos: 0, bloqueada: false };
 let sesion: Sesion = INICIAL;
 const oyentes = new Set<() => void>();
 
@@ -69,6 +81,20 @@ export function actualizarPerfil(cambios: Partial<Perfil>) {
 /** Cerrar sesión vuelve al splash y luego al login; el rol elegido se conserva para el próximo acceso. */
 export function cerrarSesion() {
   sesion = { ...INICIAL, rol: sesion.rol, busca: sesion.busca };
+  emitir();
+}
+
+/** Un intento fallido más; devuelve true si con este se bloquea la cuenta */
+export function intentoFallido() {
+  const intentos = sesion.intentos + 1;
+  sesion = { ...sesion, intentos, bloqueada: intentos >= MAX_INTENTOS };
+  emitir();
+  return sesion.bloqueada;
+}
+
+/** Acceso correcto o contraseña restablecida: se limpian los intentos y el bloqueo */
+export function desbloquear() {
+  sesion = { ...sesion, intentos: 0, bloqueada: false };
   emitir();
 }
 

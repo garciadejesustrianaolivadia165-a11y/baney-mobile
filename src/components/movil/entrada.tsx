@@ -14,6 +14,7 @@ export default function Entrada({
   keyboardType,
   className = "",
   autoCapitalize,
+  secreto,
 }: {
   label?: string;
   value: string;
@@ -23,6 +24,8 @@ export default function Entrada({
   keyboardType?: TextInputProps["keyboardType"];
   className?: string;
   autoCapitalize?: TextInputProps["autoCapitalize"];
+  /** Oculta el texto (contraseñas) */
+  secreto?: boolean;
 }) {
   const [enfocado, setEnfocado] = useState(false);
   return (
@@ -37,6 +40,7 @@ export default function Entrada({
         textAlignVertical={multiline ? "top" : "center"}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize}
+        secureTextEntry={secreto}
         onFocus={() => setEnfocado(true)}
         onBlur={() => setEnfocado(false)}
         className={`w-full rounded-2xl border-2 bg-[#F1F4F2] px-5 py-4 font-inter text-[15px] text-[#16202E] ${enfocado ? "border-secondary4-400" : "border-transparent"} ${multiline ? "min-h-[100px]" : ""}`}

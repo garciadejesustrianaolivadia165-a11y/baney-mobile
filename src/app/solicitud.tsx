@@ -12,6 +12,7 @@ import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
+import { useDirecciones } from "@/lib/direcciones";
 import { IMAGENES } from "@/lib/imagenes";
 
 const MATERIALES = [
@@ -39,6 +40,7 @@ function Titulo({ children }: { children: string }) {
 // ============ VISTA 7: SOLICITAR TRANSPORTE (ruta · carga · pago) ============
 export default function Solicitud() {
   const router = useRouter();
+  const direcciones = useDirecciones();
   const [paso, setPaso] = useState<1 | 2 | 3>(1);
   const [origen, setOrigen] = useState("Av. Abraham Lincoln, Santo Domingo");
   const [destino, setDestino] = useState("");
@@ -94,6 +96,26 @@ export default function Solicitud() {
               <View style={[SOMBRA.suave, { zIndex: 20 }]} className="gap-4 rounded-2xl border border-[#EDEFEB] bg-white px-5 py-5">
                 <BuscadorLugar etiqueta="Origen" valor={origen} onCambio={setOrigen} placeholder="¿Desde dónde sale la carga?" icono={IMAGENES["/images/image_rutas/from_icon.png"]} />
                 <BuscadorLugar etiqueta="Destino" valor={destino} onCambio={setDestino} placeholder="¿Hacia dónde va la carga?" icono={IMAGENES["/images/image_rutas/where_icon.png"]} />
+                {direcciones.length > 0 && (
+                  <View>
+                    <Texto className="text-[11px] font-bold uppercase tracking-wide text-[#9AA3AF]">Mis direcciones</Texto>
+                    <View className="mt-2 flex-row flex-wrap gap-2">
+                      {direcciones.map((d) => {
+                        const activo = destino === d.direccion;
+                        return (
+                          <Pressable key={d.id} accessibilityRole="button" accessibilityLabel={`Usar ${d.etiqueta} como destino`} onPress={() => setDestino(d.direccion)} className={`flex-row items-center gap-1.5 rounded-full border px-3 py-1.5 ${activo ? "border-secondary4-400 bg-secondary4-50" : "border-[#E3E6E0] bg-white"}`}>
+                            <Icono d={ICONOS.pin} size={12} color={activo ? TONO.activo : "#8B9A3A"} relleno />
+                            <Texto className="text-[12px] font-semibold" style={{ color: activo ? TONO.activo : TONO.inactivo }}>{d.etiqueta}</Texto>
+                          </Pressable>
+                        );
+                      })}
+                      <Pressable accessibilityRole="link" onPress={() => router.push("/cuenta/direcciones")} className="flex-row items-center gap-1 rounded-full border border-dashed border-[#B9C0CB] px-3 py-1.5">
+                        <Icono d={ICONOS.mas} size={12} color="#6B7688" strokeWidth={2.2} />
+                        <Texto className="text-[12px] font-semibold text-[#6B7688]">Guardar otra</Texto>
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
               </View>
 
               <View>
