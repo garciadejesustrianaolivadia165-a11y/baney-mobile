@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { BarraCategorias, EncabezadoCatalogo } from "@/components/catalog-header";
 import Pagina from "@/components/dashboard/pagina";
@@ -10,7 +10,9 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
-import { GALERIA, LOREM_PRODUCTO, RELACIONADOS } from "@/lib/productos";
+import { agregarAlCarrito } from "@/lib/carrito";
+import { CATALOGO, FOTO_PRODUCTO, GALERIA, LOREM_PRODUCTO, RELACIONADOS } from "@/lib/productos";
+import type { Product } from "@/types/product";
 
 const CARRITO = "M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L20 8H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z";
 const CORAZON = "M12 20.5l-1.3-1.2C6 15.2 3 12.4 3 9a4.5 4.5 0 0 1 8.2-2.5L12 7.6l.8-1.1A4.5 4.5 0 0 1 21 9c0 3.4-3 6.2-7.7 10.3L12 20.5z";
@@ -18,16 +20,23 @@ const CORAZON = "M12 20.5l-1.3-1.2C6 15.2 3 12.4 3 9a4.5 4.5 0 0 1 8.2-2.5L12 7.
 // Ficha de producto del marketplace dentro del armazón del cliente. Los botones van bajo la foto (como la web en teléfono).
 export default function ProductDetail() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const [categoria, setCategoria] = useState("Todas las áreas");
   const [temporada, setTemporada] = useState(false);
   const [filtro, setFiltro] = useState("Filtrar Por");
   const [principal, setPrincipal] = useState(0);
   const [accionesDe, setAccionesDe] = useState<string | null>(null);
 
+  // El producto de la ficha (del catálogo si existe; si no, la referencia "Guineos Criollos")
+  const base = CATALOGO.find((p) => p.id === id);
+  const producto: Product = base ?? { id: id ?? "guineos", name: "Guineos Criollos", image: FOTO_PRODUCTO, price: 300, currency: "RD$ ", rating: 5, seller: { name: "Juan Pedro García", avatar: "/images/image_home/image_home_09.png", location: "AgroMerca RD" } };
+  const [agregado, setAgregado] = useState(false);
+  const relacionado = (r: { id: string; nombre: string; img: string }): Product => ({ id: r.id, name: r.nombre, image: r.img, price: 100, currency: "RD$ ", rating: 4.5, seller: producto.seller });
+
   // Mismo orden de colores que la referencia
   const acciones = [
-    { t: "Comprar ahora", color: "#ef4444", texto: "#fff", icono: false, onPress: () => router.push("/checkout/carrito") },
-    { t: "Agregar al Carrito", color: "#5c641d", texto: "#fff", icono: true, onPress: () => router.push("/checkout/carrito") },
+    { t: "Comprar ahora", color: "#ef4444", texto: "#fff", icono: false, onPress: () => { agregarAlCarrito(producto, 1, { categoria: base?.categoria }); router.push("/cliente/carrito"); } },
+    { t: agregado ? "¡Agregado al carrito!" : "Agregar al Carrito", color: "#5c641d", texto: "#fff", icono: true, onPress: () => { agregarAlCarrito(producto, 1, { categoria: base?.categoria }); setAgregado(true); setTimeout(() => setAgregado(false), 1500); } },
     { t: "Agregar a lista de deseos", color: "#cdaf86", texto: "#20221f", icono: false, onPress: () => router.push("/dashboard/favoritos") },
   ];
 
@@ -38,10 +47,10 @@ export default function ProductDetail() {
           <EncabezadoCatalogo temporada={temporada} onTemporada={setTemporada} filtro={filtro} onFiltro={setFiltro} />
 
           <View className="mt-10 w-full">
-            <Texto className="font-sans text-2xl font-bold text-neutral-900">Guineos Criollos</Texto>
+            <Texto className="font-sans text-2xl font-bold text-neutral-900">{producto.name}</Texto>
 
             <View style={SOMBRA.card} className="mt-5 overflow-hidden rounded-2xl">
-              <Image source={imagen(GALERIA[principal])} accessibilityLabel="Guineos Criollos" contentFit="cover" style={{ width: "100%", height: 240 }} />
+              <Image source={imagen(principal === 0 ? producto.image : GALERIA[principal])} accessibilityLabel={producto.name} contentFit="cover" style={{ width: "100%", height: 240 }} />
             </View>
             <View className="mt-4 gap-3">
               {acciones.map((a) => (
@@ -89,13 +98,13 @@ export default function ProductDetail() {
                         <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} a favoritos`} hitSlop={6} className="active:scale-125">
                           <Icono d={CORAZON} size={20} color="#fff" />
                         </Pressable>
-                        <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} al carrito`} hitSlop={6} className="active:scale-125">
+                        <Pressable accessibilityRole="button" accessibilityLabel={`Agregar ${r.nombre} al carrito`} onPress={() => agregarAlCarrito(relacionado(r))} hitSlop={6} className="active:scale-125">
                           <Icono d={CARRITO} size={20} color="#fff" />
                         </Pressable>
                       </View>
                       {abierto && (
                         <View className="absolute inset-0 items-center justify-center gap-3 bg-black/35">
-                          <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={() => router.push("/checkout/carrito")} className="flex-row gap-2 px-5 py-2" sinSombra>
+                          <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={() => { agregarAlCarrito(relacionado(r)); router.push("/cliente/carrito"); }} className="flex-row gap-2 px-5 py-2" sinSombra>
                             {(pressed) => (
                               <View className="flex-row items-center gap-2">
                                 <Image source={IMAGENES["/images/image_home/Icono_01.png"]} contentFit="contain" style={{ width: 20, height: 20 }} />

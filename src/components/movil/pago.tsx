@@ -33,13 +33,22 @@ export function LogoPayPal({ size = 17 }: { size?: number }) {
   );
 }
 
-/** Desglose "Información de pago" (mismo formato que la pasarela web) */
-export function ResumenPago({ material }: { material: string }) {
-  const lineas = [
+export type Resumen = { lineas: { t: string; v: string }[]; subtotal: string; /** Líneas entre el subtotal y el total (ITBIS, envío) */ despues?: { t: string; v: string }[]; total: string };
+
+/** Desglose del transporte (paso 3 de Solicitar transporte) */
+export const resumenTransporte = (material: string): Resumen => ({
+  lineas: [
     { t: `Transporte de ${material.toLowerCase()}`, v: "RD$ 3,800.00" },
     { t: "Servicio de plataforma", v: "RD$ 450.00" },
     { t: "Seguro de carga", v: "RD$ 250.00" },
-  ];
+  ],
+  subtotal: "RD$ 4,500.00",
+  total: "RD$ 4,500.00",
+});
+
+/** Desglose "Información de pago" (mismo formato que la pasarela web); lo usan transporte y checkout */
+export function ResumenPago({ material = "Materiales", resumen }: { material?: string; resumen?: Resumen }) {
+  const { lineas, subtotal, despues = [], total } = resumen ?? resumenTransporte(material);
   return (
     <View className="mt-4 bg-[#FBF7FA] px-4 py-3">
       {lineas.map((l) => (
@@ -50,11 +59,17 @@ export function ResumenPago({ material }: { material: string }) {
       ))}
       <View className="flex-row items-center justify-between border-t border-[#D8CFD4] py-2">
         <Texto className="text-[13px] text-[#16202E]">Subtotal</Texto>
-        <Texto className="text-[13px] text-[#16202E]">RD$ 4,500.00</Texto>
+        <Texto className="text-[13px] text-[#16202E]">{subtotal}</Texto>
       </View>
+      {despues.map((l) => (
+        <View key={l.t} className="flex-row items-center justify-between gap-4 py-2">
+          <Texto className="flex-1 text-[13px] text-[#16202E]">{l.t}</Texto>
+          <Texto className="text-[13px] text-[#16202E]">{l.v}</Texto>
+        </View>
+      ))}
       <View className="flex-row items-center justify-between border-t border-[#D8CFD4] py-2">
         <Texto className="text-[13px] font-bold text-[#16202E]">Total</Texto>
-        <Texto className="text-[13px] font-bold text-[#16202E]">RD$ 4,500.00</Texto>
+        <Texto className="text-[13px] font-bold text-[#16202E]">{total}</Texto>
       </View>
     </View>
   );

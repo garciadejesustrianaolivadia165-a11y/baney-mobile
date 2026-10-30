@@ -7,7 +7,7 @@ import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import Texto from "@/components/ui/texto";
 import { imagen } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
-import { PEDIDOS_CLIENTE, pesos, totalPedido, type PedidoCliente } from "@/lib/pedidos-cliente";
+import { pesos, totalPedido, usePedidosCliente, type PedidoCliente } from "@/lib/pedidos-cliente";
 
 const CHIP: Record<PedidoCliente["estado"], [string, string]> = {
   Entregado: ["bg-success-100", "text-success-700"],
@@ -19,7 +19,8 @@ const CHIP: Record<PedidoCliente["estado"], [string, string]> = {
 export default function HistorialCliente() {
   const router = useRouter();
   const [tab, setTab] = useState<"Todos" | "En camino" | "Entregados" | "Cancelados">("Todos");
-  const visibles = PEDIDOS_CLIENTE.filter((p) => tab === "Todos" || p.estado === (tab === "Entregados" ? "Entregado" : tab === "Cancelados" ? "Cancelado" : "En camino"));
+  const pedidos = usePedidosCliente();
+  const visibles = pedidos.filter((p) => tab === "Todos" || p.estado === (tab === "Entregados" ? "Entregado" : tab === "Cancelados" ? "Cancelado" : "En camino"));
 
   return (
     <Pagina>

@@ -35,6 +35,7 @@ const PANEL: Record<RolPanel, Item[]> = {
   ],
   cliente: [
     { label: "Marketplace", href: "/cliente", ruta: "/cliente", icon: IMAGENES["/images/home.png"], exacta: true },
+    { label: "Carrito", href: "/cliente/carrito", ruta: "/cliente/carrito", svg: "M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L20 8H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" },
     { label: "Historial", href: "/cliente/historial", ruta: "/cliente/historial", icon: IMAGENES["/images/task-square.png"] },
     { label: "Notificaciones", href: "/cliente/notificaciones", ruta: "/cliente/notificaciones", icon: IMAGENES["/images/direct-inbox.png"] },
   ],

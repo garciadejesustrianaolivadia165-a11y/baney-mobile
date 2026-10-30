@@ -6,6 +6,7 @@ import Svg, { Path } from "react-native-svg";
 
 import Icono from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
+import { agregarAlCarrito } from "@/lib/carrito";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import type { Product } from "@/types/product";
@@ -38,7 +39,15 @@ export default function ProductCard({ product }: { product: Product }) {
   const router = useRouter();
   const [acciones, setAcciones] = useState(false);
   const [favorito, setFavorito] = useState(!!product.isFavorite);
+  const [agregado, setAgregado] = useState(false);
   const currency = product.currency ?? "RD$";
+  const categoria = (product as Product & { categoria?: string }).categoria;
+
+  function alCarrito() {
+    agregarAlCarrito(product, 1, { categoria });
+    setAgregado(true);
+    setTimeout(() => setAgregado(false), 1500);
+  }
 
   return (
     <View style={SOMBRA.card} className="overflow-hidden rounded-2xl bg-white">
@@ -46,9 +55,9 @@ export default function ProductCard({ product }: { product: Product }) {
         <Image source={imagen(product.image)} accessibilityLabel={product.name} contentFit="cover" style={{ width: "100%", height: "100%" }} />
         {acciones && (
           <View className="absolute inset-0 items-center justify-center gap-3 bg-black/40">
-            <Accion icono={IMAGENES["/images/image_home/Icono_01.png"]} texto="Comprar Ahora" className="bg-primary-600" onPress={() => router.push({ pathname: "/checkout/carrito", params: { producto: product.id } })} />
+            <Accion icono={IMAGENES["/images/image_home/Icono_01.png"]} texto="Comprar Ahora" className="bg-primary-600" onPress={() => { agregarAlCarrito(product, 1, { categoria }); router.push("/cliente/carrito"); }} />
             <Accion icono={IMAGENES["/images/image_home/Icono_02.png"]} texto="Ver mas detalles" className="bg-primary-400/90" onPress={() => router.push({ pathname: "/cliente/producto/[id]", params: { id: product.id } })} />
-            <Accion icono={IMAGENES["/images/image_home/Icono_03.png"]} texto="Añadir al Carrito" className="border-2 border-white bg-transparent" />
+            <Accion icono={IMAGENES["/images/image_home/Icono_03.png"]} texto={agregado ? "¡Agregado!" : "Añadir al Carrito"} className={agregado ? "bg-success-600" : "border-2 border-white bg-transparent"} onPress={alCarrito} />
           </View>
         )}
       </Pressable>

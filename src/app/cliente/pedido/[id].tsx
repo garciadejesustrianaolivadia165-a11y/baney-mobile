@@ -8,14 +8,26 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { imagen } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
-import { buscarPedidoCliente, pesos, subtotalPedido, totalPedido } from "@/lib/pedidos-cliente";
+import { agregarAlCarrito } from "@/lib/carrito";
+import { buscarPedidoCliente, pesos, subtotalPedido, totalPedido, usePedidosCliente } from "@/lib/pedidos-cliente";
 import { MapaPedido } from "../../dashboard/bandeja/pedidos/[id]";
 
 // Detalle de un pedido del cliente: misma tarjeta de "Detalles De Pedido" del proveedor
 export default function PedidoCliente() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  usePedidosCliente();
   const pedido = buscarPedidoCliente(id);
+
+  // "Pedir de nuevo": los mismos productos al carrito y al checkout
+  function pedirDeNuevo() {
+    if (!pedido) return;
+    pedido.items.forEach((i, n) => {
+      const cantidad = parseInt(i.cantidad, 10) || 1;
+      agregarAlCarrito({ id: `${pedido.id}-${n}`, name: i.nombre, image: i.img, price: Math.round(i.precio / cantidad), currency: "RD$ ", rating: 5, seller: { name: pedido.proveedor.nombre, avatar: pedido.proveedor.img, location: pedido.proveedor.lugar } }, cantidad, { unidad: i.cantidad.replace(/^\d+\s*/, "").replace(/(es|s)$/, "") || "unidad", categoria: i.categoria });
+    });
+    router.push("/cliente/carrito");
+  }
 
   if (!pedido) {
     return (
@@ -36,6 +48,13 @@ export default function PedidoCliente() {
   return (
     <Pagina>
       <TituloSeccion titulo="Detalles De Pedido" enlace="Volver Atras" href="/cliente/historial" />
+
+      {pedido.metodoPago && (
+        <View className="flex-row flex-wrap gap-2">
+          <View className="rounded-full bg-neutral-100 px-3 py-1"><Texto className="text-[11px] text-neutral-600">Pago: {pedido.metodoPago}</Texto></View>
+          {pedido.entrega && <View className="rounded-full bg-neutral-100 px-3 py-1"><Texto className="text-[11px] text-neutral-600">{pedido.entrega}</Texto></View>}
+        </View>
+      )}
 
       <View style={SOMBRA.card} className="rounded-3xl bg-white p-2 pb-8">
         <MapaPedido destino={pedido.proveedor.nombre.toUpperCase()} etiqueta="Proveedor" chipColor="#364a2d" />
@@ -90,7 +109,7 @@ export default function PedidoCliente() {
           </View>
 
           <View className="flex-row gap-3">
-            <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={() => router.push("/cliente")} className="flex-1 py-3" textClassName="font-sans text-sm" sinSombra>
+            <BotonPill color="#364a2d" textoColor="#fdf8f0" onPress={pedirDeNuevo} className="flex-1 py-3" textClassName="font-sans text-sm" sinSombra>
               Pedir de nuevo
             </BotonPill>
             {pedido.estado === "En camino" && (

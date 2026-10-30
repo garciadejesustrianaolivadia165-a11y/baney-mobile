@@ -7,6 +7,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProfilePanel from "@/components/dashboard/profile-panel";
 import Sidebar, { type RolPanel } from "@/components/dashboard/sidebar";
 import Icono, { ICONOS } from "@/components/ui/icono";
+import Texto from "@/components/ui/texto";
+import { cantidadCarrito, useCarrito } from "@/lib/carrito";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { useSesion } from "@/lib/sesion";
@@ -24,6 +26,7 @@ export default function Cascaron({ rol }: { rol: RolPanel }) {
   const sidebarFijo = ancho >= 1024;
   const conPerfil = rol === "proveedor" && ancho >= 1280;
   const cliente = rol === "cliente";
+  const enCarrito = cantidadCarrito(useCarrito());
   const avatar = cliente ? imagen(perfil.avatar) : IMAGENES["/images/image_home/Ellipse 5.png"];
 
   return (
@@ -48,7 +51,21 @@ export default function Cascaron({ rol }: { rol: RolPanel }) {
                 <Image source={IMAGENES["/logos/Logo_Horizontal_baney_png.png"]} accessibilityLabel="BANEY" contentFit="contain" style={{ width: 120, height: 36 }} />
               </Pressable>
 
-              <View className="flex-row items-center gap-3">
+              <View className="flex-row items-center gap-1">
+                {cliente && (
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Ver carrito, ${enCarrito} productos`} onPress={() => router.push("/cliente/carrito")} className="h-10 w-10 items-center justify-center rounded-full active:bg-primary-600">
+                    {({ pressed }) => (
+                      <>
+                        <Icono d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.5a2 2 0 0 0 2-1.6L20 8H6M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2zM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" size={22} color={pressed ? "#fff" : "#3F443D"} />
+                        {enCarrito > 0 && (
+                          <View className="absolute -right-0.5 -top-0.5 h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-primary-600 px-1">
+                            <Texto className="text-[9px] font-bold text-white">{enCarrito}</Texto>
+                          </View>
+                        )}
+                      </>
+                    )}
+                  </Pressable>
+                )}
                 {cliente && (
                   <Pressable accessibilityRole="button" accessibilityLabel="Ver notificaciones" onPress={() => router.push("/cliente/notificaciones")} className="h-10 w-10 items-center justify-center rounded-full active:bg-primary-600">
                     {({ pressed }) => (

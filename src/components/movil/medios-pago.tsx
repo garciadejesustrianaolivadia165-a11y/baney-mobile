@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Pressable, View } from "react-native";
 
 import BotonPill from "@/components/movil/boton-pill";
+import FormularioTarjeta from "@/components/movil/formulario-tarjeta";
 import TarjetaSeleccion, { TONO } from "@/components/movil/tarjeta-seleccion";
 import Icono, { ICONOS } from "@/components/ui/icono";
-import { BotonPago, Casilla, EntradaPago, FilaDato, LogoPayPal, MarcasTarjeta, ResumenPago } from "@/components/movil/pago";
+import { BotonPago, Casilla, EntradaPago, FilaDato, LogoPayPal, MarcasTarjeta, ResumenPago, resumenTransporte, type Resumen } from "@/components/movil/pago";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { agregarMetodo, eliminarMetodo, hacerPredeterminado, useMetodosPago } from "@/lib/pagos";
@@ -14,26 +15,14 @@ import { agregarMetodo, eliminarMetodo, hacerPredeterminado, useMetodosPago } fr
  * lista desplegable sirve para pagar un viaje (`modo="pago"`) y para administrar
  * los métodos guardados desde Perfil → Métodos de pago (`modo="gestion"`).
  */
-export default function MediosPago({ modo, material = "Materiales", onContinuar }: { modo: "pago" | "gestion"; material?: string; onContinuar?: () => void }) {
+export default function MediosPago({ modo, material = "Materiales", resumen, onContinuar }: { modo: "pago" | "gestion"; material?: string; /** Desglose a pagar (checkout); sin él se muestra el del transporte */ resumen?: Resumen; onContinuar?: (metodo: string) => void }) {
   const guardados = useMetodosPago();
   const [abierto, setAbierto] = useState<string | null>(null);
   const [eligiendo, setEligiendo] = useState(false);
-  const [titular, setTitular] = useState("");
-  const [numero, setNumero] = useState("");
-  const [vencimiento, setVencimiento] = useState("");
   const [correoPayPal, setCorreoPayPal] = useState("");
   const paypal = guardados.find((m) => m.tipo === "paypal");
   const tarjetas = guardados.filter((m) => m.tipo !== "paypal");
-
-  function guardarTarjeta() {
-    const digitos = numero.replace(/\D/g, "");
-    if (titular.trim() === "" || digitos.length < 12) return;
-    agregarMetodo({ tipo: "debito", titulo: "Tarjeta Débito", detalle: `**** ${digitos.slice(-4)}`, titular: titular.trim(), vencimiento: vencimiento || "12/28" });
-    setTitular("");
-    setNumero("");
-    setVencimiento("");
-    setAbierto(null);
-  }
+  const desglose = resumen ?? resumenTransporte(material);
 
   function vincularPayPal() {
     if (!correoPayPal.includes("@")) return;
@@ -96,7 +85,7 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
                 <FilaDato k="Número de tarjeta" v={m.detalle} />
                 <FilaDato k="Fecha de vencimiento" v={m.vencimiento ?? ""} />
                 {m.tipo === "credito" && <FilaDato k="Cuotas" v="1" />}
-                {modo === "pago" && <FilaDato k="Total" v="RD$ 4,500.00" fuerte />}
+                {modo === "pago" && <FilaDato k="Total" v={desglose.total} fuerte />}
               </View>
               <View className="mt-4">
                 <MarcasTarjeta />
@@ -104,8 +93,8 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
               {modo === "pago" ? (
                 <>
                   <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Información de pago</Texto>
-                  <ResumenPago material={material} />
-                  <BotonPago onPress={() => onContinuar?.()}>Continuar</BotonPago>
+                  <ResumenPago resumen={desglose} />
+                  <BotonPago onPress={() => onContinuar?.(`${m.titulo} ${m.detalle}`)}>Continuar</BotonPago>
                 </>
               ) : (
                 <AccionesGestion id={m.id} predeterminado={m.predeterminado} />
@@ -124,17 +113,10 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
         </Cabecera>
         {abierto === "nueva" && (
           <Detalle>
-            <Texto className="text-[20px] font-bold text-[#16202E]">Completa la información</Texto>
-            <View className="mt-4 gap-3">
-              <EntradaPago placeholder="Nombre del titular" value={titular} onChange={setTitular} />
-              <EntradaPago placeholder="Número de tarjeta" value={numero} onChange={(t) => setNumero(t.replace(/[^\d ]/g, ""))} tipo="numero" />
-              <View className="flex-row gap-3">
-                <View className="flex-1"><EntradaPago placeholder="CVC/CVV" tipo="numero" /></View>
-                <View className="flex-1"><EntradaPago placeholder="Fecha de Vencimiento" value={vencimiento} onChange={setVencimiento} /></View>
-              </View>
+            {modo === "pago" && <ResumenPago resumen={desglose} />}
+            <View className={modo === "pago" ? "mt-6" : ""}>
+              <FormularioTarjeta textoBoton={modo === "pago" ? "Continuar" : "Guardar tarjeta"} guardar={modo === "gestion"} onListo={(t) => { setAbierto(null); if (modo === "pago") onContinuar?.(`Tarjeta **** ${t.numero.slice(-4)}`); }} />
             </View>
-            <Casilla>Guardar esta tarjeta de forma segura para mi compra posterior</Casilla>
-            <BotonPago onPress={() => (modo === "pago" ? onContinuar?.() : guardarTarjeta())}>{modo === "pago" ? "Continuar" : "Guardar tarjeta"}</BotonPago>
           </Detalle>
         )}
       </View>
@@ -153,7 +135,7 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
             {modo === "pago" ? (
               <>
                 <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Información de pago</Texto>
-                <ResumenPago material={material} />
+                <ResumenPago resumen={desglose} />
                 <Texto className="mt-6 text-[20px] font-bold text-[#16202E]">Completa la información</Texto>
                 <View className="mt-4 gap-3">
                   <EntradaPago placeholder="Nombre del titular" />
@@ -166,7 +148,7 @@ export default function MediosPago({ modo, material = "Materiales", onContinuar 
                 <Casilla>
                   Acepto haber leído los <Texto className="text-[12px] text-[#4A5720] underline">términos y condiciones y políticas de privacidad</Texto> para hacer este pago
                 </Casilla>
-                <BotonPago onPress={() => onContinuar?.()}>Ir a plataforma de pago</BotonPago>
+                <BotonPago onPress={() => onContinuar?.("PayPal")}>Ir a plataforma de pago</BotonPago>
               </>
             ) : paypal ? (
               <>
