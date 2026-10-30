@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentRef, type RefObject } from "react";
 import { Pressable, ScrollView, View, type LayoutChangeEvent, type ViewProps } from "react-native";
 import { useRouter, type Href } from "expo-router";
 
@@ -10,11 +10,11 @@ import Texto from "@/components/ui/texto";
  * El buscador de la web solo aparece en móvil cuando la pantalla tiene un listado
  * (`buscador`); en pantallas anchas (tablet/web, ≥ 900 px) se muestra siempre.
  */
-export default function Pagina({ children, buscador = false, className = "gap-6" }: { children: React.ReactNode; buscador?: boolean; className?: string }) {
+export default function Pagina({ children, buscador = false, className = "gap-6", scrollRef }: { children: React.ReactNode; buscador?: boolean; className?: string; /** Para desplazar la página desde fuera (guía interactiva) */ scrollRef?: RefObject<ComponentRef<typeof ScrollView> | null> }) {
   const [ancho, setAncho] = useState(0);
   const mostrar = buscador || ancho >= 900;
   return (
-    <ScrollView onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerClassName={`pb-10 ${className}`}>
+    <ScrollView ref={scrollRef} onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled" contentContainerClassName={`pb-10 ${className}`}>
       {mostrar && <SearchHeader />}
       {children}
     </ScrollView>

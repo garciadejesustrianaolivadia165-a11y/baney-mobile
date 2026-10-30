@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { Modal, Pressable, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { Pressable, ScrollView, View, type LayoutChangeEvent, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 
+import GuiaInteractiva, { type PasoGuia } from "@/components/dashboard/guia";
 import Pagina, { TituloSeccion } from "@/components/dashboard/pagina";
 import TablaPedidos from "@/components/dashboard/tabla-pedidos";
 import BotonPill from "@/components/movil/boton-pill";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
+import { useGuia, type Rect } from "@/lib/guia";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { useMisProductos } from "@/lib/mis-productos";
@@ -27,45 +29,43 @@ const pedidos = [
   { id: "00242772363", cliente: "Mini-Market Manolo", fecha: "25/2/2026", img: `${IMG}/image_home_12.png`, descripcion: "Pimientos Importados", precio: "$ 5,000.00" },
 ];
 
-// Pasos de la guía interactiva
-const pasosGuia = [
+// Pasos de la guía interactiva: 0–3 enfocan una sección del inicio; el último, el menú lateral
+const MENU_ICONOS = {
+  inicio: ICONOS.inicio,
+  bandeja: "M22 12h-6l-2 3h-4l-2-3H2M5.5 5h13l3.5 7v7a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-7l3.5-7z",
+  finanzas: "M3 3v18h18M7 14l4-4 4 4 5-6",
+  productos: "M9 3H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM20 3h-5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 14H4a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1zM20 14h-5a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h5a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1z",
+  clientes: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  rutas: ICONOS.camion,
+  proveedores: ICONOS.empresa,
+  config: ICONOS.ajustes,
+  salir: ICONOS.salir,
+};
+const pasosGuia: PasoGuia[] = [
   { titulo: "Bienvenida", texto: "Este es tu panel de inicio. Aquí te saludamos y desde este botón puedes volver a abrir esta guía cuando quieras." },
   { titulo: "Nuevos pedidos", texto: "Estas alertas te avisan de cada pedido nuevo y qué tan completo está. Toca una para ver el pedido." },
   { titulo: "Tus Productos", texto: "Aquí ves tu inventario: desliza con el dedo, toca un producto para editar su stock y marca tus favoritos con el corazón." },
-  { titulo: "Pedidos En Curso", texto: "Esta tabla lista los pedidos activos de tus clientes con su estado, descripción y precio. Toca uno para ver su detalle." },
+  { titulo: "Pedidos En Curso", texto: "Esta tabla lista los pedidos activos de tus clientes con su estado, descripción y precio. Toca uno para ver dónde va, cuándo llega y contactar al transportista." },
+  {
+    titulo: "Menú lateral",
+    texto: "Desde este botón abres el menú con todas las secciones de tu negocio:",
+    lista: [
+      { icono: MENU_ICONOS.inicio, nombre: "Inicio", detalle: "Este panel: bienvenida, alertas, tus productos y pedidos en curso." },
+      { icono: MENU_ICONOS.bandeja, nombre: "Bandeja de entrada", detalle: "Los pedidos que llegan: ábrelos, acéptalos o recházalos." },
+      { icono: MENU_ICONOS.finanzas, nombre: "Finanzas", detalle: "Ventas, ingresos, gráficos e indicadores económicos y de productos." },
+      { icono: MENU_ICONOS.productos, nombre: "Mis productos", detalle: "Tu catálogo: publica productos, edita precio y stock." },
+      { icono: MENU_ICONOS.clientes, nombre: "Clientes", detalle: "Quién te ha comprado, qué pidió y a dónde se envió." },
+      { icono: MENU_ICONOS.rutas, nombre: "Rutas", detalle: "Pedidos en camino: mapa, hora de llegada y transportista." },
+      { icono: MENU_ICONOS.proveedores, nombre: "Otros proveedores", detalle: "Conoce a otros productores de BANEY y lo que distribuyen." },
+      { icono: MENU_ICONOS.config, nombre: "Configuración", detalle: "Notificaciones, seguridad, direcciones, documentos y tu cuenta." },
+      { icono: MENU_ICONOS.salir, nombre: "Cerrar Sección", detalle: "Sal de tu cuenta; volverás a la pantalla de inicio de sesión." },
+    ],
+  },
 ];
+const PASO_MENU = pasosGuia.length - 1;
 
 const CORAZON = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
 const PEDIDO = "M6 2l1.5 4h9L18 2M3 6h18l-2 14H5L3 6zM9 10v4M15 10v4";
-
-// En la web la tarjeta flota junto a la sección resaltada; aquí va en un Modal
-// sobre el fondo oscurecido y la sección activa se marca con un anillo verde.
-function TarjetaGuia({ paso, setPaso }: { paso: number; setPaso: (p: number | null) => void }) {
-  const info = pasosGuia[paso];
-  return (
-    <Modal transparent animationType="fade" visible onRequestClose={() => setPaso(null)}>
-      <Pressable accessibilityLabel="Cerrar guía" onPress={() => setPaso(null)} className="flex-1 items-center justify-end bg-black/60 p-6">
-        <Pressable onPress={() => {}} style={SOMBRA.alta} className="w-80 rounded-2xl bg-white p-5">
-          <Texto className="font-sans text-base font-bold text-[#415936]">{info.titulo}</Texto>
-          <Texto className="mt-2 text-sm leading-relaxed text-neutral-600">{info.texto}</Texto>
-          <View className="mt-4 flex-row items-center justify-between">
-            <Texto className="text-xs font-medium text-neutral-400">Paso {paso + 1} de {pasosGuia.length}</Texto>
-            <View className="flex-row gap-2">
-              {paso > 0 && (
-                <BotonPill color="#bdc1b9" variante="borde" textoColor="#4d5148" onPress={() => setPaso(paso - 1)} className="px-4 py-1.5" textClassName="text-xs font-semibold" sinSombra>
-                  Anterior
-                </BotonPill>
-              )}
-              <BotonPill color="#364a2d" onPress={() => setPaso(paso < pasosGuia.length - 1 ? paso + 1 : null)} className="px-4 py-1.5" textClassName="text-xs font-semibold" sinSombra>
-                {paso < pasosGuia.length - 1 ? "Siguiente" : "Terminar"}
-              </BotonPill>
-            </View>
-          </View>
-        </Pressable>
-      </Pressable>
-    </Modal>
-  );
-}
 
 export default function DashboardOverview() {
   const router = useRouter();
@@ -73,6 +73,33 @@ export default function DashboardOverview() {
   // null = guía apagada; 0..n = paso activo
   const [paso, setPaso] = useState<number | null>(null);
   const [favoritos, setFavoritos] = useState<string[]>([]);
+
+  // Foco de la guía: cada sección guarda su ref y su posición en la página; al cambiar
+  // de paso se desplaza hasta ella y se mide en coordenadas de ventana para el hueco.
+  const scrollPagina = useRef<ComponentRef<typeof ScrollView>>(null);
+  const secciones = useRef<(ComponentRef<typeof View> | null)[]>([]);
+  const posiciones = useRef<number[]>([]);
+  const [rect, setRect] = useState<Rect | null>(null);
+  const { botonMenu, sidebar } = useGuia();
+  useEffect(() => {
+    if (paso === null) return;
+    setRect(null);
+    if (paso === PASO_MENU) {
+      setRect(sidebar ?? botonMenu);
+      return;
+    }
+    scrollPagina.current?.scrollTo({ y: Math.max(0, (posiciones.current[paso] ?? 0) - 12), animated: true });
+    const t = setTimeout(() => secciones.current[paso]?.measureInWindow((x, y, w, h) => setRect({ x, y, w, h })), 450);
+    return () => clearTimeout(t);
+  }, [paso, botonMenu, sidebar]);
+  const seccion = (i: number) => ({
+    ref: (el: ComponentRef<typeof View> | null) => {
+      secciones.current[i] = el;
+    },
+    onLayout: (e: LayoutChangeEvent) => {
+      posiciones.current[i] = e.nativeEvent.layout.y;
+    },
+  });
 
   // Carrusel de "Tus Productos": 1 tarjeta en teléfono, 2 en tablet, 3 en escritorio.
   // Se desliza con el dedo y avanza solo cada 3,5 s (se pausa mientras se arrastra).
@@ -102,15 +129,14 @@ export default function DashboardOverview() {
 
   const anteriorProd = () => setIdxProd((i) => (i <= 0 ? total - 1 : i - 1));
   const siguienteProd = () => setIdxProd((i) => (i + 1) % total);
-  const resaltado = (i: number) => (paso === i ? "rounded-3xl border-4 border-primary-300" : "");
   const progreso = (stock: number) => Math.min(100, Math.round((stock / 150) * 100));
 
   return (
-    <Pagina>
-      {paso !== null && <TarjetaGuia paso={paso} setPaso={setPaso} />}
+    <Pagina scrollRef={scrollPagina}>
+      {paso !== null && <GuiaInteractiva pasos={pasosGuia} paso={paso} setPaso={setPaso} rect={rect} />}
 
       {/* Banner de bienvenida */}
-      <View style={SOMBRA.alta} className={`rounded-3xl bg-[#556B2F] p-8 ${resaltado(0)}`}>
+      <View {...seccion(0)} style={SOMBRA.alta} className="rounded-3xl bg-[#556B2F] p-8">
         <Texto className="text-xs font-semibold uppercase tracking-widest text-white/85">Bienvenido Nuevamente</Texto>
         <Texto className="mt-2 font-sans text-3xl font-bold text-white">José Pérez Guzmán</Texto>
         <BotonPill color="#20221f" onPress={() => setPaso(0)} className="mt-6 self-start px-5 py-2.5">
@@ -126,7 +152,7 @@ export default function DashboardOverview() {
       </View>
 
       {/* Nuevos pedidos: mismas alertas que la versión de transporte */}
-      <View className={resaltado(1)}>
+      <View {...seccion(1)}>
         <Texto className="font-sans text-xl font-semibold text-[#3F443D]">Nuevos pedidos</Texto>
         {nuevosPedidos.map((n) => (
           <Pressable key={n.id + n.hora} accessibilityRole="link" accessibilityLabel={`Ver pedido de ${n.cliente}`} onPress={() => router.push({ pathname: "/dashboard/bandeja/pedidos/[id]", params: { id: n.id } })} className="active:opacity-80">
@@ -145,7 +171,7 @@ export default function DashboardOverview() {
       </View>
 
       {/* Tus Productos */}
-      <View className={resaltado(2)} onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)}>
+      <View ref={(el) => { secciones.current[2] = el; }} onLayout={(e: LayoutChangeEvent) => { setAncho(e.nativeEvent.layout.width); posiciones.current[2] = e.nativeEvent.layout.y; }}>
         <View className="flex-row items-center justify-between">
           <Texto className="font-sans text-xl font-semibold text-[#3F443D]">Tus Productos</Texto>
           <View className="flex-row gap-2">
@@ -216,7 +242,7 @@ export default function DashboardOverview() {
       </View>
 
       {/* Pedidos En Curso */}
-      <View className={resaltado(3)}>
+      <View {...seccion(3)}>
         <TituloSeccion titulo="Pedidos En Curso" enlace="Ver Todos" href="/dashboard/rutas" />
         <TablaPedidos pedidos={pedidos} onFila={(p) => router.push({ pathname: "/dashboard/rutas/[pedidoId]", params: { pedidoId: p.id } })} />
       </View>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type ComponentRef } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 import { Image } from "expo-image";
 import { Stack, useRouter } from "expo-router";
@@ -9,6 +9,7 @@ import Sidebar, { type RolPanel } from "@/components/dashboard/sidebar";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { cantidadCarrito, useCarrito } from "@/lib/carrito";
+import { registrarGuia } from "@/lib/guia";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { SOMBRA } from "@/lib/estilos";
 import { useSesion } from "@/lib/sesion";
@@ -27,17 +28,30 @@ export default function Cascaron({ rol }: { rol: RolPanel }) {
   const conPerfil = rol === "proveedor" && ancho >= 1280;
   const cliente = rol === "cliente";
   const enCarrito = cantidadCarrito(useCarrito());
+  const botonMenu = useRef<ComponentRef<typeof View>>(null);
+  const sidebarFijoRef = useRef<ComponentRef<typeof View>>(null);
+  // La guía interactiva del inicio enfoca el botón del menú (o el menú fijo en pantallas anchas)
+  const medirMenu = () => {
+    botonMenu.current?.measureInWindow((x, y, w, h) => registrarGuia({ botonMenu: { x, y, w, h } }));
+    sidebarFijoRef.current?.measureInWindow((x, y, w, h) => registrarGuia({ sidebar: { x, y, w, h } }));
+  };
   const avatar = cliente ? imagen(perfil.avatar) : IMAGENES["/images/image_home/Ellipse 5.png"];
 
   return (
     <SafeAreaView className="flex-1 bg-white" onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)}>
       <View className="flex-1 flex-row gap-6 p-4">
-        {sidebarFijo && <Sidebar fijo rol={rol} />}
+        {sidebarFijo && (
+          <View ref={sidebarFijoRef} onLayout={medirMenu}>
+            <Sidebar fijo rol={rol} />
+          </View>
+        )}
 
         <View className="min-w-0 flex-1">
           {!sidebarFijo && (
             <View className="mb-5 flex-row items-center justify-between gap-4">
               <Pressable
+                ref={botonMenu}
+                onLayout={medirMenu}
                 accessibilityRole="button"
                 accessibilityLabel="Abrir menú"
                 onPress={() => setMenuAbierto(true)}

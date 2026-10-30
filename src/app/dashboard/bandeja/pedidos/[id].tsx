@@ -36,7 +36,10 @@ export const UBICACION = "M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z";
 export function MapaPedido({ alto = 288, destino = "MELLOS'S COLMADO", etiqueta = "Destino", chipColor = "#20221f" }: { alto?: number; destino?: string; etiqueta?: string; chipColor?: string }) {
   return (
     <View style={{ height: alto }} className="overflow-hidden rounded-[1.25rem] bg-neutral-200">
-      <Mapa />
+      {/* Vista previa: sin gestos, para que el mapa nativo no se quede con el scroll de la página */}
+      <View pointerEvents="none" className="flex-1">
+        <Mapa />
+      </View>
       <View pointerEvents="none" className="absolute right-6 top-6 items-end rounded-2xl bg-white/75 px-4 py-2">
         <Texto className="text-2xl font-bold text-neutral-900">Calle Juan Horacio #16</Texto>
         <Texto className="text-sm text-neutral-500">Santo Domingo, Republica Dominicana</Texto>
