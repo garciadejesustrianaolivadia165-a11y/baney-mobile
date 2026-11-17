@@ -1,0 +1,25 @@
+name: Prepare Expo dependency correction
+on:
+  push:
+    branches: [codex/hostinger-deployment]
+    paths: [.github/workflows/refresh-expo-dependencies.yml]
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx expo install --fix --npm
+      - uses: actions/upload-artifact@v4
+        with:
+          name: expo-dependency-correction
+          path: |
+            package.json
+            package-lock.json
+          retention-days: 3
