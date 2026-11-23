@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import Button from "@/components/ui/button";
 import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
+import { userApi } from "@/lib/api";
 
 // UC-AUTH-05 · Forgot password: se pide el correo y se envía un código de 6 dígitos.
 export default function OlvideContrasena() {
@@ -12,13 +13,13 @@ export default function OlvideContrasena() {
   const [correo, setCorreo] = useState("");
   const [error, setError] = useState("");
 
-  function enviar() {
+  async function enviar() {
     if (!/^\S+@\S+\.\S+$/.test(correo)) {
       setError("Correo electrónico incorrecto");
       return;
     }
     setError("");
-    // TODO: POST /auth/forgot-password; por ahora pasa directo al código
+    try { await userApi.requestPasswordReset(correo.trim()); } catch { setError("No se pudo enviar el código. Intenta nuevamente."); return; }
     router.push({ pathname: "/codigo", params: { flujo: "reset", correo } });
   }
 

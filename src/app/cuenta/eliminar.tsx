@@ -11,6 +11,7 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { actualizarSesion, cerrarSesion } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 const MOTIVOS = ["Ya no lo necesito", "Tengo otra cuenta", "Problemas con pedidos o pagos", "Privacidad de mis datos", "Otro"];
 
@@ -23,9 +24,14 @@ export default function EliminarCuenta() {
   const [entiendo, setEntiendo] = useState(false);
   const [eliminada, setEliminada] = useState(false);
 
-  function eliminar() {
-    // TODO: DELETE /users/me con la contraseña; aquí se cierra la sesión y se olvida el rol
-    setEliminada(true);
+  async function eliminar() {
+    try {
+      await userApi.closeAccount({ password: contrasena, reason: detalle ? `${motivo}: ${detalle}` : motivo });
+      userApi.logout();
+      setEliminada(true);
+    } catch {
+      setEliminada(false);
+    }
   }
 
   if (eliminada) {

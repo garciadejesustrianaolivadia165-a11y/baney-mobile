@@ -1,4 +1,5 @@
 import { Linking, Pressable, ScrollView, View } from "react-native";
+import { useEffect, useState } from "react";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +15,7 @@ import { C, SOMBRA } from "@/lib/estilos";
 import { imagen, IMAGENES } from "@/lib/imagenes";
 import { buscarViaje, pesos } from "@/lib/viajes";
 import { useSesion } from "@/lib/sesion";
+import { transportApi } from "@/lib/api";
 
 const ICONO_MATERIAL: Record<string, string> = {
   Materiales: "M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9zM8 9V7a4 4 0 0 1 8 0v2",
@@ -51,6 +53,8 @@ function Fila({ k, v, fuerte }: { k: string; v: string; fuerte?: boolean }) {
 export default function DetalleViaje() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const [remoteRequest, setRemoteRequest] = useState<any>(null);
+  useEffect(() => { if (id) void transportApi.getRequest(id).then(setRemoteRequest).catch(() => undefined); }, [id]);
   const viaje = buscarViaje(id);
   const { rol } = useSesion();
   const historico = !!viaje?.estado;
@@ -67,6 +71,17 @@ export default function DetalleViaje() {
   }
 
   const total = viaje.precio + viaje.servicio + viaje.seguro;
+  const remoteStatus = remoteRequest?.data?.status ?? remoteRequest?.status;
+  const decidirOferta = async (aceptar: boolean) => {
+    if (!id) return;
+    const offers = await transportApi.listOffers(id) as any;
+    const list = offers?.data ?? offers;
+    const offerId = Array.isArray(list) ? list[0]?.id : undefined;
+    if (!offerId) return;
+    if (aceptar) await transportApi.acceptOffer(id, offerId);
+    else await transportApi.rejectOffer(id, offerId);
+    router.replace(aceptar ? "/transportista-mapa" : "/transportista");
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -85,7 +100,7 @@ export default function DetalleViaje() {
             </View>
           </View>
           <View className={`absolute right-4 top-4 rounded-md px-2.5 py-1 ${viaje.estado === "Cancelado" ? "bg-error-100" : viaje.tono === "ok" ? "bg-success-100" : "bg-warning-100"}`}>
-            <Texto className={`text-[11px] font-semibold ${viaje.estado === "Cancelado" ? "text-error-600" : viaje.tono === "ok" ? "text-success-700" : "text-warning-800"}`}>{viaje.chip}</Texto>
+            <Texto className={`text-[11px] font-semibold ${viaje.estado === "Cancelado" ? "text-error-600" : viaje.tono === "ok" ? "text-success-700" : "text-warning-800"}`}>{remoteStatus ?? viaje.chip}</Texto>
           </View>
         </View>
 
@@ -202,10 +217,10 @@ export default function DetalleViaje() {
           </>
         ) : (
           <>
-            <BotonPill color={C.oliva} onPress={() => router.replace("/transportista-mapa")} className="flex-1 py-4" textClassName="text-[15px]">
+            <BotonPill color={C.oliva} onPress={() => void decidirOferta(true)} className="flex-1 py-4" textClassName="text-[15px]">
               Aceptar viaje
             </BotonPill>
-            <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => router.back()} className="px-6 py-4" textClassName="text-[15px]" sinSombra>
+            <BotonPill color="#E9564F" variante="borde" textoColor="#E9564F" onPress={() => void decidirOferta(false)} className="px-6 py-4" textClassName="text-[15px]" sinSombra>
               Rechazar
             </BotonPill>
           </>

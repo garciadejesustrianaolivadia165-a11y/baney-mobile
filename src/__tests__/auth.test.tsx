@@ -6,6 +6,10 @@ import Login from "@/app/(auth)/login";
 import { contrasenaValida } from "@/app/(auth)/restablecer";
 import { desbloquear, MAX_INTENTOS } from "@/lib/sesion";
 
+jest.mock("@/lib/api", () => ({
+  userApi: { login: jest.fn().mockResolvedValue({ data: { access_token: "test", refresh_token: "test", token_type: "bearer", expires_in: 900 } }) },
+}));
+
 describe("contraseña: requisitos", () => {
   it("exige 8 caracteres, una mayúscula y un número", async () => {
     expect(contrasenaValida("baney2026")).toBe(false);
@@ -38,7 +42,6 @@ describe("Login (UC-AUTH-02 / UC-AUTH-11)", () => {
   it("muestra los errores de cada campo cuando el formulario está vacío", async () => {
     await render(<Login />);
     await fireEvent.press(screen.getByText("Iniciar Sección"));
-    expect(screen.getByText("Nombre incorrecto")).toBeTruthy();
     expect(screen.getByText("Correo electrónico incorrecto")).toBeTruthy();
     expect(screen.getByText("Contraseña incorrecta")).toBeTruthy();
     expect(router.replace).not.toHaveBeenCalled();

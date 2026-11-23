@@ -7,6 +7,7 @@ import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { imagen } from "@/lib/imagenes";
 import { cerrarSesion, SALIDA, useSesion } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 type Opcion = { t: string; d: string; bg: string; color: string; i: string; href: Href; circulos?: [number, number, number][] };
 
@@ -92,7 +93,7 @@ export default function Perfil() {
           <Pressable
             accessibilityRole="button"
             onPress={() => {
-              cerrarSesion();
+              userApi.logout(); cerrarSesion();
               router.replace(SALIDA);
             }}
             className="flex-row items-center gap-4 px-5 py-4 active:bg-error-50"

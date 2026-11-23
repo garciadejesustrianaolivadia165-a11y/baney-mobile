@@ -6,6 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "baney",
+    "extra": {
+      "userApiUrl": "https://srv2122223.hstgr.cloud/api/users",
+      "transportApiUrl": "https://srv2122223.hstgr.cloud/api/transport"
+    },
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,

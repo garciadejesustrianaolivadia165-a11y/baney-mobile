@@ -12,6 +12,7 @@ import { SOMBRA } from "@/lib/estilos";
 import { actualizarPreferencias, usePreferencias } from "@/lib/preferencias";
 import { cerrarSesion, SALIDA } from "@/lib/sesion";
 import { contrasenaValida, RequisitosContrasena } from "../(auth)/restablecer";
+import { userApi } from "@/lib/api";
 
 /** Notificaciones y seguridad (lo comparten Perfil → Configuración y el menú del cliente) */
 export function ConfiguracionContenido() {
@@ -57,7 +58,7 @@ export function ConfiguracionContenido() {
             <Entrada label="Contraseña actual" value={actual} onChange={setActual} placeholder="••••••••" autoCapitalize="none" secreto />
             <Entrada label="Nueva contraseña" value={nueva} onChange={(v) => { setNueva(v); setCambiada(false); }} placeholder="Mínimo 8 caracteres" autoCapitalize="none" secreto />
             {nueva !== "" && <RequisitosContrasena valor={nueva} />}
-            <BotonPill color="#3D4D18" disabled={actual === "" || !contrasenaValida(nueva)} onPress={() => { setActual(""); setNueva(""); setCambiada(true); }} className="w-full py-3.5" textClassName="text-[15px]" sinSombra>
+            <BotonPill color="#3D4D18" disabled={actual === "" || !contrasenaValida(nueva)} onPress={async () => { try { await userApi.changePassword({ current_password: actual, new_password: nueva }); setActual(""); setNueva(""); setCambiada(true); } catch { setCambiada(false); } }} className="w-full py-3.5" textClassName="text-[15px]" sinSombra>
               Cambiar contraseña
             </BotonPill>
             {cambiada && (

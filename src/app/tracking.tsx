@@ -1,6 +1,7 @@
 import { Pressable, ScrollView, View } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 
 import Mapa from "@/components/mapa";
 import { TarjetaContacto, TarjetaLlegada } from "@/components/transporte/tarjetas-ruta";
@@ -10,12 +11,16 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
 import { IMAGENES } from "@/lib/imagenes";
+import { transportApi } from "@/lib/api";
 
 const TRANSPORTISTA: Transportista = { nombre: "José Rodríguez", avatar: "/images/image_home/image_home_09.png", vehiculo: "Mack Granite (Rojo)", placa: "ABC-1234", telefono: "+18095550177", calificacion: 4.9 };
 
 // ============ VISTA 9: TRACKING ============
 export default function Tracking() {
   const router = useRouter();
+  const { requestId } = useLocalSearchParams<{ requestId?: string }>();
+  const [points, setPoints] = useState<unknown[]>([]);
+  useEffect(() => { if (!requestId) return; const load = () => void transportApi.getTracking(requestId).then((r: any) => setPoints(r?.data ?? r ?? [])).catch(() => undefined); load(); const timer = setInterval(load, 15000); return () => clearInterval(timer); }, [requestId]);
 
   return (
     <View className="flex-1 bg-white">

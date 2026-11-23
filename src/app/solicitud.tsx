@@ -14,6 +14,7 @@ import Texto from "@/components/ui/texto";
 import { C, SOMBRA } from "@/lib/estilos";
 import { useDirecciones } from "@/lib/direcciones";
 import { IMAGENES } from "@/lib/imagenes";
+import { transportApi } from "@/lib/api";
 
 const MATERIALES = [
   { m: "Materiales", d: "M4 9h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9zM8 9V7a4 4 0 0 1 8 0v2" },
@@ -51,6 +52,8 @@ export default function Solicitud() {
   const [unidad, setUnidad] = useState("Ton");
   const [condiciones, setCondiciones] = useState<string[]>([]);
   const [notas, setNotas] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const [errorEnvio, setErrorEnvio] = useState<string | null>(null);
 
   function alternarCondicion(c: string) {
     setCondiciones((prev) =>
@@ -64,7 +67,29 @@ export default function Solicitud() {
     );
   }
 
-  const confirmar = () => router.replace("/confirmada");
+  const confirmar = async () => {
+    if (!destino.trim() || enviando) return;
+    setErrorEnvio(null);
+    setEnviando(true);
+    const materialType: Record<string, string> = { Materiales: "MATERIALS", Agregados: "AGGREGATES", Maquinaria: "MACHINERY", Otro: "OTHER" };
+    try {
+      const factor = unidad === "Ton" ? 1000 : unidad === "lb" ? 0.453592 : 1;
+      const created: any = await transportApi.createRequest({
+        cargo: { description: notas.trim() || material, weightKg: Number(peso) * factor, volumeM3: unidad === "m³" ? Number(peso) : undefined },
+        origin: { address: origen, latitude: 18.4861, longitude: -69.9312 },
+        destination: { address: destino, latitude: 18.45, longitude: -69.95 },
+        timeWindow: { startsAt: new Date().toISOString(), endsAt: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString() },
+        cargoType: materialType[material],
+      }, `mobile-${Date.now()}`);
+      const requestId = created?.data?.id ?? created?.id;
+      if (!requestId) throw new Error("La API no devolvió el ID de la solicitud");
+      router.replace({ pathname: "/confirmada", params: { requestId: String(requestId) } });
+    } catch (error) {
+      setErrorEnvio(error instanceof Error ? error.message : "No se pudo crear la solicitud");
+    } finally {
+      setEnviando(false);
+    }
+  };
   const volver = () => (paso === 1 ? router.back() : setPaso((p) => (p === 3 ? 2 : 1)));
 
   return (
@@ -232,6 +257,8 @@ export default function Solicitud() {
 
           {/* ---------- PASO 3: PAGO (pasarela compartida con Perfil → Métodos de pago) ---------- */}
           {paso === 3 && <MediosPago modo="pago" material={material} onContinuar={confirmar} />}
+          {errorEnvio && <Texto accessibilityRole="alert" className="rounded-xl bg-error-100 px-4 py-3 text-[13px] text-error-700">{errorEnvio}</Texto>}
+          {enviando && <Texto className="text-center text-[13px] text-[#6B7688]">Guardando solicitud…</Texto>}
         </ScrollView>
       </KeyboardAvoidingView>
 

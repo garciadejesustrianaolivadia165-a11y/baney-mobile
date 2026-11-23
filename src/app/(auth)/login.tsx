@@ -9,6 +9,7 @@ import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
 import { usePreferencias } from "@/lib/preferencias";
 import { desbloquear, destinoPorRol, intentoFallido, MAX_INTENTOS, useSesion } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 type LoginErrors = { nombre?: string; correo?: string; contrasena?: string };
 
@@ -36,14 +37,13 @@ export default function Login() {
     router.replace(destinoPorRol());
   };
 
-  function enviar() {
+  async function enviar() {
     if (bloqueada) {
       router.replace("/bloqueada");
       return;
     }
     // Vista "Error de Acceso": los mensajes aparecen bajo cada campo inválido
     const next: LoginErrors = {};
-    if (!nombre.trim()) next.nombre = "Nombre incorrecto";
     if (!/^\S+@\S+\.\S+$/.test(correo)) next.correo = "Correo electrónico incorrecto";
     if (contrasena.length < 6) next.contrasena = "Contraseña incorrecta";
     setErrors(next);
@@ -53,7 +53,13 @@ export default function Login() {
       if (intentoFallido()) router.replace("/bloqueada");
       return;
     }
-    // TODO: llamar a la API real; por ahora simula el acceso exitoso.
+    try {
+      await userApi.login({ email: correo.trim(), password: contrasena });
+    } catch {
+      setErrors({ correo: "No se pudo iniciar sesión", contrasena: "Verifica tus credenciales" });
+      intentoFallido();
+      return;
+    }
     // UC-AUTH-07: con verificación en dos pasos activa se pide el código antes de entrar.
     if (dosPasos) router.push({ pathname: "/codigo", params: { flujo: "login", correo } });
     else entrar();

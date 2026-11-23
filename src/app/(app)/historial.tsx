@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +8,7 @@ import Icono, { ICONOS } from "@/components/ui/icono";
 import Texto from "@/components/ui/texto";
 import { SOMBRA } from "@/lib/estilos";
 import { pesos, VIAJES_HISTORIAL } from "@/lib/viajes";
+import { transportApi } from "@/lib/api";
 
 // Cada viaje del historial abre el mismo "Detalle del viaje" que una solicitud
 const viajeAFila = (v: (typeof VIAJES_HISTORIAL)[number]) => ({ id: v.id, n: v.detalle, f: v.fecha ?? "", de: v.origen, a: v.destino, p: pesos(v.precio + v.servicio + v.seguro) });
@@ -18,7 +19,33 @@ const CANCELADOS = VIAJES_HISTORIAL.filter((v) => v.estado === "Cancelado").map(
 export default function Historial() {
   const router = useRouter();
   const [tab, setTab] = useState<"Completados" | "Cancelados">("Completados");
-  const viajes = tab === "Completados" ? COMPLETADOS : CANCELADOS;
+  const [viajesRemotos, setViajesRemotos] = useState<typeof COMPLETADOS | null>(null);
+
+  useEffect(() => {
+    let activo = true;
+    transportApi.history().then((resultado) => {
+      const filas = Array.isArray(resultado) ? resultado : (resultado as { data?: unknown[] })?.data;
+      if (!activo || !Array.isArray(filas)) return;
+      const mapeados = filas.map((viaje: any) => ({
+        id: String(viaje.id ?? viaje.requestId),
+        n: "Envío de transporte",
+        f: viaje.completedAt ?? viaje.startedAt ?? "",
+        de: viaje.origin ?? "Origen no disponible",
+        a: viaje.destination ?? "Destino no disponible",
+        p: "Precio pendiente",
+        estado: String(viaje.status ?? "").toUpperCase(),
+      }));
+      setViajesRemotos(mapeados as typeof COMPLETADOS);
+    }).catch(() => {
+      // Conserva los datos de demostración si la sesión aún no tiene historial.
+    });
+    return () => { activo = false; };
+  }, []);
+
+  const viajesFuente = viajesRemotos ?? [...COMPLETADOS, ...CANCELADOS];
+  const viajes = viajesFuente.filter((v) => tab === "Completados"
+    ? ["DELIVERED", "COMPLETED", "ENTREGADO"].includes((v as any).estado ?? "") || (viajesRemotos === null && COMPLETADOS.some((x) => x.id === v.id))
+    : ["CANCELLED", "CANCELED", "CANCELADO"].includes((v as any).estado ?? "") || (viajesRemotos === null && CANCELADOS.some((x) => x.id === v.id)));
 
   return (
     <SafeAreaView edges={["top"]} className="flex-1 bg-[#FBFBFA]">
@@ -39,7 +66,7 @@ export default function Historial() {
       </View>
 
       <ScrollView contentContainerClassName="px-5 pb-6" showsVerticalScrollIndicator={false}>
-        <Texto className="pt-6 text-[12px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">Octubre 2023</Texto>
+        <Texto className="pt-6 text-[12px] font-bold uppercase tracking-[0.08em] text-[#9AA3AF]">Viajes registrados</Texto>
 
         <View className="gap-5 pt-4">
           {viajes.map((v) => (

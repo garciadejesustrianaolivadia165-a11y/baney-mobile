@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import BotonPill from "@/components/movil/boton-pill";
@@ -16,6 +16,7 @@ const DATOS: [string, string, string][] = [
 // ============ VISTA 8: SOLICITUD CONFIRMADA ============
 export default function Confirmada() {
   const router = useRouter();
+  const { requestId } = useLocalSearchParams<{ requestId?: string }>();
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -43,7 +44,7 @@ export default function Confirmada() {
           ))}
         </View>
 
-        <BotonPill color={C.oliva} onPress={() => router.replace("/tracking")} className="mt-8 w-full py-4" textClassName="text-[15px]">
+        <BotonPill color={C.oliva} onPress={() => router.replace({ pathname: "/tracking", params: requestId ? { requestId } : undefined })} className="mt-8 w-full py-4" textClassName="text-[15px]">
           Seguir mi pedido
         </BotonPill>
         <BotonPill color="#EDEFEB" variante="borde" textoColor={C.tinta} onPress={() => router.replace("/mapa")} className="mt-4 w-full py-4" textClassName="text-[15px]">

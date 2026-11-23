@@ -7,6 +7,7 @@ import Reenviar from "@/components/auth/reenviar";
 import Button from "@/components/ui/button";
 import Texto from "@/components/ui/texto";
 import { actualizarSesion, desbloquear, destinoPorRol } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 export type FlujoCodigo = "reset" | "correo" | "login";
 
@@ -26,14 +27,19 @@ export default function Codigo() {
   const [error, setError] = useState("");
   const [comprobando, setComprobando] = useState(false);
 
-  function confirmar() {
+  async function confirmar() {
     if (codigo.length < LARGO_CODIGO) {
       setError("Escribe los 6 dígitos del código");
       return;
     }
     setComprobando(true);
-    // TODO: POST /auth/verify-otp. Simulación: "000000" es un código incorrecto.
-    setTimeout(() => {
+    try {
+      if (flujo === "reset") {
+        router.replace({ pathname: "/restablecer", params: { token: codigo } });
+        return;
+      }
+      if (flujo === "correo") await userApi.verifyEmail(codigo);
+      setComprobando(false);
       setComprobando(false);
       if (codigo === "000000") {
         setError("Código incorrecto o vencido. Pide uno nuevo.");
@@ -48,7 +54,11 @@ export default function Codigo() {
         desbloquear();
         router.replace(destinoPorRol());
       }
-    }, 600);
+    } catch {
+      setComprobando(false);
+      setError("Código incorrecto o vencido. Pide uno nuevo.");
+      setCodigo("");
+    }
   }
 
   // Al completar las 6 casillas se comprueba solo

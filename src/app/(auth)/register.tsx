@@ -9,6 +9,7 @@ import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
 import { SeparadorOr } from "./login";
 import { actualizarPerfil, actualizarSesion, destinoPorRol, useSesion } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 export default function Register() {
   const router = useRouter();
@@ -20,7 +21,7 @@ export default function Register() {
     return (value: string) => setForm((prev) => ({ ...prev, [field]: value }));
   }
 
-  function enviar() {
+  async function enviar() {
     const e: Partial<typeof form> = {};
     if (!form.nombre.trim()) e.nombre = "Escribe tu nombre";
     if (!form.apellido.trim()) e.apellido = "Escribe tu apellido";
@@ -28,7 +29,12 @@ export default function Register() {
     if (form.contrasena.length < 8) e.contrasena = "Mínimo 8 caracteres";
     setErrores(e);
     if (Object.keys(e).length > 0) return;
-    // TODO: llamar a la API real; por ahora simula el registro exitoso.
+    try {
+      await userApi.register({ email: form.correo.trim(), password: form.contrasena, full_name: `${form.nombre.trim()} ${form.apellido.trim()}`, phone: form.telefono.trim() || undefined, language: "es" });
+    } catch {
+      setErrores({ correo: "No se pudo crear la cuenta. El correo podría estar registrado." });
+      return;
+    }
     // UC-AUTH-10: la cuenta queda pendiente hasta verificar el correo.
     actualizarPerfil({ nombres: form.nombre.trim(), apellidos: form.apellido.trim(), correo: form.correo.trim(), cedula: form.cedula.trim(), telefono: form.telefono.trim() });
     actualizarSesion({ correoPendiente: form.correo });

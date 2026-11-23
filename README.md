@@ -4,6 +4,13 @@ Migración del frontend web de BANEY (`Fronted_CANEY-RD`, React Router + Tailwin
 React Native con **Expo SDK 58**, **Expo Router** y **NativeWind v4**. Un solo código
 para Android, iOS y web.
 
+## Conexión con microservicios
+
+El cliente usa `src/lib/api.ts` para User Service y Transport Service. Copia
+`.env.example` a `.env` y configura `EXPO_PUBLIC_USER_API_URL` y
+`EXPO_PUBLIC_TRANSPORT_API_URL` antes de iniciar Expo. En un teléfono físico
+no uses `localhost`: utiliza la IP LAN o los dominios HTTPS del despliegue.
+
 ## Comandos
 
 ```bash

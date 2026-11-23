@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { View } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import Button from "@/components/ui/button";
 import Icono, { ICONOS } from "@/components/ui/icono";
 import InputField from "@/components/ui/input";
 import Texto from "@/components/ui/texto";
 import { desbloquear } from "@/lib/sesion";
+import { userApi } from "@/lib/api";
 
 export const REQUISITOS: { texto: string; cumple: (p: string) => boolean }[] = [
   { texto: "Mínimo 8 caracteres", cumple: (p) => p.length >= 8 },
@@ -38,12 +39,13 @@ export const contrasenaValida = (p: string) => REQUISITOS.every((r) => r.cumple(
 // UC-AUTH-06 · Reset password: nueva contraseña tras validar el código de recuperación.
 export default function Restablecer() {
   const router = useRouter();
+  const { token = "" } = useLocalSearchParams<{ token?: string }>();
   const [nueva, setNueva] = useState("");
   const [confirmar, setConfirmar] = useState("");
   const [error, setError] = useState("");
   const [lista, setLista] = useState(false);
 
-  function guardar() {
+  async function guardar() {
     if (!contrasenaValida(nueva)) {
       setError("La contraseña no cumple los requisitos");
       return;
@@ -52,7 +54,7 @@ export default function Restablecer() {
       setError("Las contraseñas no coinciden");
       return;
     }
-    // TODO: POST /auth/reset-password
+    try { await userApi.confirmPasswordReset(token, nueva); } catch { setError("El código es inválido o ha vencido."); return; }
     desbloquear();
     setLista(true);
   }
