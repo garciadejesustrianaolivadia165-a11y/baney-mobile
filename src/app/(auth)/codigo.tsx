@@ -40,14 +40,12 @@ export default function Codigo() {
       }
       if (flujo === "correo") await userApi.verifyEmail(codigo);
       setComprobando(false);
-      setComprobando(false);
       if (codigo === "000000") {
         setError("Código incorrecto o vencido. Pide uno nuevo.");
         setCodigo("");
         return;
       }
-      if (flujo === "reset") router.replace("/restablecer");
-      else if (flujo === "correo") {
+      if (flujo === "correo") {
         actualizarSesion({ correoPendiente: "" });
         router.replace("/cuenta/completar");
       } else {

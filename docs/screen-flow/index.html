@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BANEY Screen Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: una banda por rol; dentro, cada caso de uso es una fila horizontal de pantallas unidas por flechas. */
+:root{
+  --bg:#ffffff; --fg:#3F443D; --muted:#7E8A80; --surface:#F6F7F2; --line:#E3E6DC;
+  --accent:#415936; --accent-soft:#E9EEDC; --lime:#9EAA31; --beige:#D9C7A7;
+  --display:"Poppins",system-ui,sans-serif; --body:"Inter",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --bg:#1C1F17; --fg:#ECEFE6; --muted:#A3AA9B; --surface:#262A1F; --line:#394030; --accent:#B9C86F; --accent-soft:#2F3826; --lime:#C7D45A; --beige:#6B5C3E; color-scheme:dark } }
+:root[data-theme="dark"]{ --bg:#1C1F17; --fg:#ECEFE6; --muted:#A3AA9B; --surface:#262A1F; --line:#394030; --accent:#B9C86F; --accent-soft:#2F3826; --lime:#C7D45A; --beige:#6B5C3E; color-scheme:dark }
+body{background:var(--bg);color:var(--fg);font-family:var(--body);padding-block:0 4rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{max-width:1100px;margin:0 auto;padding-block:2.5rem 1.5rem}
+h1{font-family:var(--display);font-size:clamp(1.6rem,3vw,2.3rem);margin:0 0 .4rem;text-wrap:balance;color:var(--accent)}
+.sub{color:var(--muted);max-width:65ch;margin:0 0 1.2rem;line-height:1.5}
+.leyenda{display:flex;flex-wrap:wrap;gap:.5rem 1rem;font-size:.82rem;color:var(--muted)}
+.leyenda b{color:var(--fg);font-weight:600}
+nav.roles{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+nav.roles a{text-decoration:none;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:.35rem .9rem;font-size:.85rem;font-weight:600}
+section.rol{max-width:1100px;margin:0 auto;padding-block:1.5rem;border-top:1px solid var(--line)}
+section.rol h2{font-family:var(--display);font-size:1.35rem;margin:0;color:var(--fg)}
+section.rol .quien{color:var(--muted);font-size:.9rem;margin:.25rem 0 1rem;max-width:65ch}
+.uc{margin-top:1.6rem}
+.uc h3{font-family:var(--display);font-size:1rem;font-weight:600;margin:0 0 .15rem;display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap}
+.uc h3 .cod{font-family:var(--body);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:.15rem .5rem;border-radius:4px}
+.uc p{margin:0 0 .8rem;color:var(--muted);font-size:.88rem;max-width:70ch;line-height:1.45}
+.fila{display:flex;gap:0;overflow-x:auto;padding-bottom:.6rem;scroll-snap-type:x proximity;align-items:flex-start}
+.paso{flex:0 0 auto;width:186px;scroll-snap-align:start;min-width:0}
+.paso img{display:block;width:170px;max-width:100%;border-radius:18px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.14);background:var(--surface)}
+.paso .n{font-size:.7rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin:.55rem 0 .1rem;font-variant-numeric:tabular-nums}
+.paso .t{font-weight:600;font-size:.85rem;line-height:1.25;width:170px}
+.paso .r{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.7rem;color:var(--muted);width:170px;word-break:break-all;margin-top:.15rem}
+.flecha{flex:0 0 auto;width:16px;height:844px;max-height:368px;display:flex;align-items:center;justify-content:center;color:var(--lime);font-size:1.1rem;margin:0 -8px 0 -8px;position:relative;z-index:1}
+.flecha.alt::after{content:attr(data-l);position:absolute;top:50%;left:50%;transform:translate(-50%,1.1rem);font-size:.62rem;color:var(--muted);white-space:nowrap;background:var(--bg);padding:0 .2rem}
+.estado{display:inline-block;font-size:.68rem;color:var(--fg);background:var(--beige);border-radius:4px;padding:.05rem .4rem;margin-top:.3rem}
+footer{max-width:1100px;margin:2rem auto 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:1rem;line-height:1.5}
+footer code{font-size:.78rem}
+@media (max-width:600px){.paso{width:150px}.paso img,.paso .t,.paso .r{width:136px}}
+@media (prefers-reduced-motion:no-preference){.paso img{transition:transform .15s}.paso img:hover{transform:translateY(-3px)}}
+</style>
+</head>
+<body>
+<header>
+  <h1>BANEY · Screen Flow de la app móvil</h1>
+  <p class="sub">Recorrido pantalla por pantalla de todos los casos de uso del sistema, agrupados por rol. Cada fila es un caso de uso: se lee de izquierda a derecha siguiendo las flechas. Las capturas son reales, tomadas del build actual de la app (Expo, 390×844) con datos de ejemplo.</p>
+  <div class="leyenda"><span><b>→</b> navegación</span><span><b>⇢</b> ramal alternativo o de error</span><span><b>ruta</b> en monoespaciado = archivo en <b>src/app/</b></span></div>
+  <nav class="roles" id="nav"></nav>
+</header>
+<div id="cuerpo"></div>
+<footer>
+  Generado desde <code>docs/screen-flow/</code> del repositorio <code>caneyRD/baney-frontend-mobile</code>. Las capturas se regeneran con <code>node docs/screen-flow/capturar.js</code> tras <code>npm run export:web</code>. Las llamadas a la API están simuladas en las capturas; la API real responde en producción.
+</footer>
+<script>
+const I = (n) => `img/${n}.png`;
+const ROLES = [
+ { id:"acceso", titulo:"1 · Acceso (todos los roles)", quien:"Quien abre la app por primera vez o vuelve a entrar: cliente, transportista o proveedor. No existe landing ni home público: el único flujo de entrada es splash → onboarding → elegir rol → registro o inicio de sesión.",
+   ucs:[
+    { cod:"UC-ACC-01", t:"Primer arranque y elección de rol", d:"El splash dura 2,5 s y lleva al onboarding (3 pantallas, con Omitir). El rol decide a qué módulo entra el usuario después de autenticarse.",
+      pasos:[["a01-splash","Splash","/ (index.tsx)"],["a02-onboarding-1","Onboarding 1 · La logística inteligente","/onboarding"],["a03-onboarding-2","Onboarding 2 · Para productores","/onboarding"],["a04-onboarding-3","Onboarding 3 · Clientes y constructores","/onboarding"],["a05-rol","Cuéntanos sobre ti (rol)","/rol"],["a06-busca","Cliente: ¿qué buscas?","/busca",">solo cliente"]] },
+    { cod:"UC-AUTH-01", t:"Registro con correo y verificación", d:"Crea tu cuenta → se envía un código al correo (POST /auth/register) → OTP de 6 dígitos → completar perfil. También Google y Apple como accesos sociales.",
+      pasos:[["a07-register","Crea tu cuenta","/register"],["a13-verifica-correo","Revisa tu correo","/verifica"],["a11-codigo","Código de verificación (OTP)","/codigo?flujo=correo"],["a15-completar-perfil","Completa tu perfil","/cuenta/completar"]] },
+    { cod:"UC-AUTH-02", t:"Inicio de sesión y errores de acceso", d:"Valida formato y credenciales (POST /auth/login). Cada fallo descuenta un intento; al quinto la cuenta queda bloqueada. Con verificación en dos pasos activa, pide el código antes de entrar.",
+      pasos:[["a08-login","Inicio de Sección","/login"],["a09-login-error","Error de acceso (intentos restantes)","/login",">credenciales inválidas"],["a14-bloqueada","Cuenta bloqueada","/bloqueada",">5 intentos"],["a11-codigo","Código 2FA","/codigo?flujo=login",">dos pasos activo"]] },
+    { cod:"UC-AUTH-03", t:"Recuperar contraseña", d:"¿Olvidaste tu contraseña? → correo → código → nueva contraseña con requisitos → vuelve al login.",
+      pasos:[["a10-olvide","¿Olvidaste tu contraseña?","/olvide"],["a11-codigo","Código de recuperación","/codigo?flujo=reset"],["a12-restablecer","Nueva contraseña","/restablecer"],["a08-login","Inicio de Sección","/login"]] },
+   ]},
+ { id:"cliente", titulo:"2 · Cliente (compra en el marketplace)", quien:"Comprador de productos agropecuarios. Entra al catálogo, arma el carrito, paga y sigue sus pedidos. Usa el mismo armazón del dashboard (menú lateral + cabecera con carrito, campanita y foto).",
+   ucs:[
+    { cod:"UC-CLI-01", t:"Explorar catálogo y ficha de producto", d:"Catálogo con áreas, interruptor de temporada y filtro; ficha con descripción, unidad, relacionados y corazón de favoritos.",
+      pasos:[["b01-marketplace","Catálogo de productos","/cliente"],["b02-menu-cliente","Menú lateral del cliente","/cliente (menú)"],["b03-producto","Ficha de producto","/cliente/producto/[id]"]] },
+    { cod:"UC-CLI-02", t:"Comprar: carrito → entrega y pago → confirmación", d:"Pasos 1-3 del checkout (04–06 del Figma). Entrega por Transporte BANEY (RD$ 650) o recoger en la finca; pago con tarjeta guardada, nueva tarjeta o PayPal; al confirmar se crea el pedido y se vacía el carrito.",
+      pasos:[["b04-carrito","Carrito (ITBIS 18 % y envío)","/cliente/carrito"],["b05-pago","Entrega y pago","/cliente/pago"],["b08-tarjeta","Agregar tarjeta","/cliente/tarjeta",">nueva tarjeta"],["b06-pago-paypal","Pago con PayPal","/cliente/pago",">PayPal"],["b07-pasarela-paypal","Pasarela PayPal (acceso → confirmar)","pasarela-paypal.tsx"],["b09-confirmacion","Pedido confirmado","/cliente/confirmacion?id="]] },
+    { cod:"UC-CLI-03", t:"Seguir, cancelar o repetir un pedido", d:"Historial con estados; detalle con ítems, proveedor, entrega, Cancelar (si aún es NUEVO) y Pedir de nuevo (rellena el carrito).",
+      pasos:[["b10-historial","Mis pedidos","/cliente/historial"],["b11-pedido-detalle","Detalle del pedido","/cliente/pedido/[id]"],["b04-carrito","Pedir de nuevo → carrito","/cliente/carrito",">repetir"]] },
+    { cod:"UC-CLI-04", t:"Lista de deseos, notificaciones y cuenta", d:"Favoritos compartidos entre tarjeta, ficha y carrusel; notificaciones de pedidos; métodos de pago (misma pasarela en modo gestión); configuración (dos pasos, notificaciones); perfil.",
+      pasos:[["b12-favoritos","Favoritos (lista de deseos)","/cliente/favoritos"],["b13-notificaciones","Notificaciones","/cliente/notificaciones"],["b14-metodos-pago","Métodos de pago","/cliente/pagos"],["b15-configuracion","Configuración","/cliente/configuracion"],["b16-perfil","Perfil","/cliente/perfil"]] },
+   ]},
+ { id:"transporte", titulo:"3 · Transporte (Fase 1: cliente que pide un camión y transportista)", quien:"Módulo de logística. El cliente que busca transporte entra al mapa, pide un camión en 3 pasos y sigue el viaje. El transportista publica disponibilidad, administra su flota y atiende solicitudes cercanas.",
+   ucs:[
+    { cod:"UC-TRA-01", t:"Solicitar transporte (cliente)", d:"Mapa con panel desplegable → Solicitar: paso 1 ruta (origen, destino, ahora o programar), paso 2 carga (peso, unidad, condiciones), paso 3 medio de pago → solicitud confirmada → tracking en vivo (POST /transport-requests y /tracking).",
+      pasos:[["c01-mapa-cliente","Mapa del cliente","/mapa"],["c02-solicitud-1","Solicitar · 1 Ruta","/solicitud"],["c03-solicitud-2","Solicitar · 2 Carga","/solicitud"],["c04-solicitud-3-pago","Solicitar · 3 Pago","/solicitud"],["c05-confirmada","¡Solicitud confirmada!","/confirmada"],["c06-tracking","Seguimiento del viaje","/tracking"]] },
+    { cod:"UC-TRA-02", t:"Historial, alertas y perfil (barra inferior)", d:"Pestañas de la app móvil: historial de viajes (completados / en curso), alertas con ofertas y mensajes, perfil con accesos a datos, pagos, empresa y configuración.",
+      pasos:[["c07-historial","Historial de viajes","/historial"],["c08-alertas","Notificaciones / alertas","/alertas"],["c09-perfil-movil","Perfil móvil","/perfil"]] },
+    { cod:"UC-TRA-03", t:"Transportista: disponibilidad, flota y viajes", d:"Inicio del transportista (publicar disponibilidad, zona y vehículo), mapa con clientes cercanos, detalle de una solicitud con aceptar/rechazar y contraoferta (API transport), flota y alta de vehículo. La cuenta queda “en revisión” hasta que un administrador la aprueba.",
+      pasos:[["c10-transportista-inicio","Inicio del transportista","/transportista"],["c11-transportista-mapa","Mapa del transportista","/transportista-mapa"],["c14-viaje-detalle","Detalle de solicitud / viaje","/viaje/[id]"],["c12-flota","Mi flota","/flota"],["c13-camion-nuevo","Nuevo camión","/camion/nuevo"]] },
+   ]},
+ { id:"proveedor", titulo:"4 · Proveedor (dashboard)", quien:"Productor o distribuidor que publica su catálogo, atiende pedidos, despacha rutas y revisa sus finanzas. En el teléfono el menú lateral se abre como cajón; en pantallas anchas queda fijo con el panel de perfil.",
+   ucs:[
+    { cod:"UC-PRO-01", t:"Inicio y guía interactiva", d:"Resumen de ventas, nuevos pedidos (NUEVO), pedidos en curso (EN PROCESO), tus productos y clientes. La guía enfoca cada sección y termina explicando el menú opción por opción.",
+      pasos:[["d01-inicio","Dashboard del proveedor","/dashboard"],["d02-guia","Guía interactiva con foco","/dashboard (guía)"],["d03-menu-proveedor","Menú lateral del proveedor","/dashboard (menú)"]] },
+    { cod:"UC-PRO-02", t:"Atender pedidos", d:"Estados NUEVO → EN PROCESO → COMPLETADO (o RECHAZADO / CANCELADO). Bandeja → lista con filtros y menú Aceptar / Rechazar / Ver detalle → detalle con ítems, agregar o quitar ítems y Marcar como entregado.",
+      pasos:[["d04-bandeja","Bandeja de entrada","/dashboard/bandeja"],["d05-pedidos","Tus pedidos (filtros y acciones)","/dashboard/bandeja/pedidos"],["d06-pedido-detalle","Detalles de pedido","/dashboard/bandeja/pedidos/[id]"],["d17-rutas","Rutas (pedidos en proceso)","/dashboard/rutas",">al aceptar"]] },
+    { cod:"UC-PRO-03", t:"Despachar una ruta", d:"Cada pedido EN PROCESO tiene su ruta: mapa de vista previa, llegada estimada y avance, transportista (Llamar / Mensaje), cliente, ítems y acciones.",
+      pasos:[["d17-rutas","Rutas en curso","/dashboard/rutas"],["d18-ruta-detalle","Detalle de la ruta","/dashboard/rutas/[pedidoId]"],["e09-chat","Mensaje al transportista","/chat/[id]",">Mensaje"]] },
+    { cod:"UC-PRO-04", t:"Administrar el catálogo (Mis productos)", d:"Lista con filtros por categoría y estado; alta de producto con galería de fotos (expo-image-picker); edición de existencia y precio por producto.",
+      pasos:[["d12-mis-productos","Mis productos","/dashboard/productos"],["d13-producto-nuevo","Nuevo producto","/dashboard/productos/nuevo"],["d14-stock","Existencia y precio","/dashboard/productos/[id]/stock"]] },
+    { cod:"UC-PRO-05", t:"Finanzas e indicadores", d:"Cinco vistas con gráficos SVG propios (dona, barras, líneas, área) que reaccionan al filtro de periodo: resumen, indicadores, indicadores de productos, económicos y resumen general de pedidos.",
+      pasos:[["d07-finanzas","Finanzas","/dashboard/finanzas"],["d08-indicadores","Indicadores","/dashboard/finanzas/indicadores"],["d09-finanzas-productos","Indicadores de productos","/dashboard/finanzas/productos"],["d10-economicos","Indicadores económicos","/dashboard/finanzas/economicos"],["d11-economicos-resumen","Resumen general de pedidos","/dashboard/finanzas/economicos/resumen"]] },
+    { cod:"UC-PRO-06", t:"Clientes y otros proveedores", d:"Clientes que han comprado (burbuja “Cliente recurrente” con 3+ pedidos) y su detalle con pedidos, fechas y destinos; ficha de otro proveedor con lo que distribuye y sus precios.",
+      pasos:[["d15-clientes","Clientes","/dashboard/clientes"],["d16-cliente-detalle","Detalle del cliente","/dashboard/clientes/[id]"],["d23-otro-proveedor","Otro proveedor","/dashboard/proveedores/[id]"]] },
+    { cod:"UC-PRO-07", t:"Favoritos, perfil, pagos y configuración", d:"Productos destacados del proveedor; Mi Perfil (formulario compartido con Datos personales y Mi Empresa); métodos de pago (pasarela en modo gestión); configuración de cuenta.",
+      pasos:[["d19-favoritos","Favoritos","/dashboard/favoritos"],["d20-perfil","Mi Perfil","/dashboard/perfil"],["d21-metodos-pago","Métodos de pago","/dashboard/pagos"],["d22-configuracion","Configuración","/dashboard/configuracion"]] },
+   ]},
+ { id:"cuenta", titulo:"5 · Cuenta, documentos y mensajería (comunes a los tres roles)", quien:"Pantallas de cuenta accesibles desde el perfil de cualquier rol, y el chat que se abre desde rutas, tracking, viajes y el menú.",
+   ucs:[
+    { cod:"UC-CTA-01", t:"Datos personales y empresa", d:"El mismo formulario de perfil con secciones (PATCH /me). Para el transportista, Mi Empresa muestra su flota y licencia.",
+      pasos:[["e01-datos-personales","Datos personales","/cuenta/datos"],["e02-empresa","Mi Empresa","/cuenta/empresa"]] },
+    { cod:"UC-CTA-02", t:"Direcciones", d:"Lista de direcciones guardadas y alta/edición; las direcciones aparecen como chips bajo el destino de una solicitud de transporte y en la entrega del checkout.",
+      pasos:[["e03-direcciones","Mis direcciones","/cuenta/direcciones"],["e04-direccion-nueva","Nueva dirección","/cuenta/direccion?id="]] },
+    { cod:"UC-CTA-03", t:"Documentos para verificación", d:"Documentos requeridos según el rol (cédula, licencia, matrícula, RNC…), subida de imagen o PDF con expo-document-picker. Un administrador aprueba la cuenta desde el servicio de usuarios.",
+      pasos:[["e05-documentos","Mis documentos","/cuenta/documentos"]] },
+    { cod:"UC-CTA-04", t:"Configuración, contraseña y eliminar cuenta", d:"Notificaciones, dos pasos, cambio de contraseña (POST /me/password) y cierre de cuenta con motivo + contraseña + casilla (POST /me/close) → despedida → splash.",
+      pasos:[["e06-configuracion-cuenta","Configuración","/cuenta/configuracion"],["e07-eliminar-cuenta","Eliminar cuenta","/cuenta/eliminar"],["a01-splash","Salida al splash","/?destino=login"]] },
+    { cod:"UC-MSG-01", t:"Mensajes", d:"Lista de conversaciones y chat con respuesta simulada; abrirChatCon() crea o reutiliza la conversación con el transportista, cliente o proveedor.",
+      pasos:[["e08-chats","Mensajes","/chat"],["e09-chat","Conversación","/chat/[id]"]] },
+   ]},
+];
+const nav = document.getElementById("nav"), cuerpo = document.getElementById("cuerpo");
+let total = 0;
+for (const r of ROLES) {
+  const a = document.createElement("a"); a.href = "#" + r.id; a.textContent = r.titulo.replace(/^\d · /, ""); nav.appendChild(a);
+  const s = document.createElement("section"); s.className = "rol"; s.id = r.id;
+  s.innerHTML = `<h2>${r.titulo}</h2><p class="quien">${r.quien}</p>`;
+  for (const uc of r.ucs) {
+    const d = document.createElement("div"); d.className = "uc";
+    d.innerHTML = `<h3><span class="cod">${uc.cod}</span>${uc.t}</h3><p>${uc.d}</p>`;
+    const fila = document.createElement("div"); fila.className = "fila";
+    uc.pasos.forEach(([img, t, ruta, alt], i) => {
+      if (i > 0) { const f = document.createElement("div"); f.className = "flecha" + (alt ? " alt" : ""); f.textContent = alt ? "⇢" : "→"; if (alt) f.dataset.l = alt.slice(1); fila.appendChild(f); }
+      const p = document.createElement("div"); p.className = "paso"; total++;
+      p.innerHTML = `<img src="${I(img)}" alt="${t}" loading="lazy" width="390" height="844"><div class="n">Paso ${i + 1}</div><div class="t">${t}</div><div class="r">${ruta}</div>`;
+      fila.appendChild(p);
+    });
+    d.appendChild(fila); s.appendChild(d);
+  }
+  cuerpo.appendChild(s);
+}
+</script>
+
+</body>
+</html>
