@@ -9,10 +9,10 @@
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "do.baney.app"
+      "bundleIdentifier": "com.baneyrd.app"
     },
     "android": {
-      "package": "do.baney.app",
+      "package": "com.baneyrd.app",
       "adaptiveIcon": {
         "backgroundColor": "#2e320e",
         "foregroundImage": "./assets/android-icon-foreground.png",
