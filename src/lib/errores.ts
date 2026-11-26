@@ -45,6 +45,8 @@ type GlobalConErrorUtils = typeof globalThis & {
 };
 
 export function instalarCapturaGlobal() {
+  // Se llama desde index.js (punto de entrada) para que quede instalada antes
+  // de evaluar cualquier otro módulo de la app.
   const eu = (globalThis as GlobalConErrorUtils).ErrorUtils;
   if (!eu || (instalarCapturaGlobal as { hecho?: boolean }).hecho) return;
   (instalarCapturaGlobal as { hecho?: boolean }).hecho = true;
@@ -54,3 +56,5 @@ export function instalarCapturaGlobal() {
     if (__DEV__) console.error(e);
   });
 }
+
+instalarCapturaGlobal();

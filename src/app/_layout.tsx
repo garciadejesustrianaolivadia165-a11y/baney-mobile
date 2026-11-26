@@ -7,11 +7,8 @@ import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 
 import PantallaError from "@/components/pantalla-error";
-import { instalarCapturaGlobal, limpiarError, useErrorCapturado } from "@/lib/errores";
+import { limpiarError, useErrorCapturado } from "@/lib/errores";
 import { FUENTES } from "@/lib/fuentes";
-
-// Antes de nada: que un error no controlado no cierre la app en silencio.
-instalarCapturaGlobal();
 
 // El splash (fondo caney-dark con el logotipo blanco, ver app.json) se mantiene
 // hasta que las fuentes están listas, igual que la LoadingScreen de la web.
