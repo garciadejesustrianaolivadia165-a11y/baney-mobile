@@ -6,7 +6,6 @@ export const IMAGENES = {
   "/images/BlobsVector_01_login.png": require("../../assets/images/BlobsVector_01_login.png"),
   "/images/BlobsVector_02_login.png": require("../../assets/images/BlobsVector_02_login.png"),
   "/images/Fondo_login.jpg": require("../../assets/images/Fondo_login.jpg"),
-  "/images/Home (no login) _Oficial.jpg": require("../../assets/images/Home (no login) _Oficial.jpg"),
   "/images/Home (no login) _Oficial.png": require("../../assets/images/Home (no login) _Oficial.png"),
   "/images/Image_login.png": require("../../assets/images/Image_login.png"),
   "/images/direct-inbox.png": require("../../assets/images/direct-inbox.png"),
@@ -61,7 +60,6 @@ export const IMAGENES = {
   "/logos/Baney_logo_png.png": require("../../assets/logos/Baney_logo_png.png"),
   "/logos/Logo_Horizontal_baney.jpg": require("../../assets/logos/Logo_Horizontal_baney.jpg"),
   "/logos/Logo_Horizontal_baney_png.png": require("../../assets/logos/Logo_Horizontal_baney_png.png"),
-  "/logos/Logotipo_BANEY.jpg": require("../../assets/logos/Logotipo_BANEY.jpg"),
   "/logos/Logotipo_BANEY.png": require("../../assets/logos/Logotipo_BANEY.png"),
   "/logos/paypal.png": require("../../assets/logos/paypal.png"),
 } as const satisfies Record<string, number>;
