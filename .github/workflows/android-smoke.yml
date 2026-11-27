@@ -1,0 +1,51 @@
+name: Diagnose Android APK startup
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Build run containing the APK artifact
+        required: true
+        default: '46036965998'
+      artifact_name:
+        description: APK artifact name
+        required: true
+        default: unverified-apk-do-not-publish-46036965998
+permissions:
+  contents: read
+  actions: read
+jobs:
+  startup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reserve runner disk for emulator userdata
+        run: |
+          # Only this disposable emulator job; .NET is not used by the test.
+          sudo rm -rf /usr/share/dotnet
+          df -h /
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name || 'unverified-apk-do-not-publish-46036965998' }}
+          run-id: ${{ inputs.run_id || '46036965998' }}
+          github-token: ${{ github.token }}
+          path: apk-input
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: bash scripts/android-smoke.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-startup-${{ github.run_id }}
+          path: android-diagnostics/
+          retention-days: 7

@@ -1,0 +1,147 @@
+name: Build signed Android APK (no EAS)
+on:
+  push:
+    branches: [main, codex/android-apk-gradle]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: '1'
+      EXPO_NO_TELEMETRY: '1'
+      EXPO_PUBLIC_USER_API_URL: https://srv2122223.hstgr.cloud/api/users
+      EXPO_PUBLIC_TRANSPORT_API_URL: https://srv2122223.hstgr.cloud/api/transport
+      GOOGLE_MAPS_KEY_APP: ${{ secrets.GOOGLE_MAPS_KEY_APP }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify JavaScript
+        run: |
+          npx expo export --platform web
+          npm run typecheck
+          npm test -- --runInBand
+      - name: Restore private signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          test -n "$KEYSTORE_BASE64"
+          test -n "$GOOGLE_MAPS_KEY_APP"
+          umask 077
+          printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/baney-release.jks"
+          echo "ANDROID_VERSION_CODE=$((100000 + GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT))" >> "$GITHUB_ENV"
+      - name: Generate native Android project
+        run: npx expo prebuild --platform android --no-install
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-provider: basic
+          cache-read-only: false
+      - name: Assemble release APK with Gradle
+        env:
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/baney-release.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --no-daemon --max-workers=2 --build-cache -PreactNativeArchitectures=arm64-v8a,armeabi-v7a,x86_64
+      - name: Verify signature and prepare download bundle
+        env:
+          EXPECTED_SIGNER_SHA256: ${{ vars.ANDROID_SIGNER_SHA256 }}
+        run: |
+          test -n "$EXPECTED_SIGNER_SHA256"
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          APK=android/app/build/outputs/apk/release/app-release.apk
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" > "$RUNNER_TEMP/signature.txt"
+          cat "$RUNNER_TEMP/signature.txt"
+          # Build-tools 37 uses "V2 Signer:"; older tools use "Signer #1".
+          ACTUAL=$(sed -n 's/^.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/signature.txt" | tr '[:upper:]' '[:lower:]' | sort -u)
+          EXPECTED=$(printf '%s' "$EXPECTED_SIGNER_SHA256" | tr -d ':' | tr '[:upper:]' '[:lower:]')
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "::error::APK signer does not match the configured certificate"
+            exit 1
+          fi
+          "$BUILD_TOOLS/aapt" dump badging "$APK" > "$RUNNER_TEMP/badging.txt"
+          head -1 "$RUNNER_TEMP/badging.txt"
+          grep -q "package: name='do.baney.app' versionCode='$ANDROID_VERSION_CODE'" "$RUNNER_TEMP/badging.txt"
+          mkdir -p release
+          cp "$APK" "release/baney-$ANDROID_VERSION_CODE.apk"
+          node scripts/android-release-manifest.cjs
+      - name: Preserve APK for diagnosis if verification fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unverified-apk-do-not-publish-${{ github.run_id }}
+          path: |
+            android/app/build/outputs/apk/release/*.apk
+            ${{ runner.temp }}/signature.txt
+            ${{ runner.temp }}/badging.txt
+          if-no-files-found: ignore
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: baney-android-${{ env.ANDROID_VERSION_CODE }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/baney-release.jks"
+  startup:
+    needs: apk
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [35, 36]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reserve runner disk for Android 16 userdata
+        run: |
+          # Only this disposable emulator job; .NET is not used by the test.
+          sudo rm -rf /usr/share/dotnet
+          df -h /
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: baney-android-*
+          path: apk-input
+          merge-multiple: true
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          script: bash scripts/android-smoke.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-startup-api-${{ matrix.api-level }}
+          path: android-diagnostics/
+          retention-days: 7

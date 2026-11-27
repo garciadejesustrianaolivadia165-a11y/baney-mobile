@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 
 import PantallaError from "@/components/pantalla-error";
+import AndroidUpdateNotice from "@/components/android-update-notice";
 import { limpiarError, useErrorCapturado } from "@/lib/errores";
 import { FUENTES } from "@/lib/fuentes";
 
@@ -35,6 +36,7 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="dark" />
+      <AndroidUpdateNotice />
       <Stack
         screenOptions={{
           headerShown: false,
