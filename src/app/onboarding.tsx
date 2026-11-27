@@ -57,14 +57,6 @@ export default function Onboarding() {
 
   return (
     <SafeAreaView edges={["bottom"]} className="flex-1 bg-white">
-      {/* Mancha decorativa oficial (assets/images) */}
-      <Image
-        pointerEvents="none"
-        source={IMAGENES["/images/BlobsVector_01_login.png"]}
-        contentFit="contain"
-        style={{ position: "absolute", top: -32, left: 118, width: 302, height: 302, zIndex: 20 }}
-      />
-
       {/* Pista del carrusel: imagen + textos se desplazan juntos */}
       <View className="flex-1" onLayout={medir}>
         {width > 0 && (

@@ -17,7 +17,8 @@ export default function AuthLayout() {
 
   return (
     <View className="flex-1 bg-primary-100" onLayout={(e: LayoutChangeEvent) => setAncho(e.nativeEvent.layout.width)}>
-      <Image source={IMAGENES["/images/Fondo_login.jpg"]} contentFit="cover" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
+      {/* En móvil, recorte vertical del campo (sin el cielo) para que la foto llene la pantalla centrada */}
+      <Image source={IMAGENES[ancha ? "/images/Fondo_login.jpg" : "/images/Fondo_login_movil.jpg"]} contentFit="cover" contentPosition="center" style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
       <View className="absolute inset-0 bg-white/50" />
 
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">

@@ -6,6 +6,7 @@ export const IMAGENES = {
   "/images/BlobsVector_01_login.png": require("../../assets/images/BlobsVector_01_login.png"),
   "/images/BlobsVector_02_login.png": require("../../assets/images/BlobsVector_02_login.png"),
   "/images/Fondo_login.jpg": require("../../assets/images/Fondo_login.jpg"),
+  "/images/Fondo_login_movil.jpg": require("../../assets/images/Fondo_login_movil.jpg"),
   "/images/Home (no login) _Oficial.png": require("../../assets/images/Home (no login) _Oficial.png"),
   "/images/Image_login.png": require("../../assets/images/Image_login.png"),
   "/images/direct-inbox.png": require("../../assets/images/direct-inbox.png"),
